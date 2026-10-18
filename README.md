@@ -109,3 +109,16 @@ Never commit `.env`.
 - **`api` keeps waiting:** it starts only after MySQL is healthy, which can take about 30 seconds on the first run.
 - **First start fails during `npm install`:** `api` and `web` share one `node_modules` volume; run `docker compose up` again.
 - **No hot reload on Windows:** file watchers poll through `docker-compose.override.yml`; make sure the override file is not deleted.
+
+## Database migrations
+
+The API applies pending migrations on startup. Manual control (inside the container use
+`docker compose exec api <command>`):
+
+```bash
+npm run migration:generate -w apps/api -- src/migrations/<Name>
+npm run migration:run -w apps/api
+npm run migration:revert -w apps/api
+```
+
+See `docs/features/typeorm-mysql-migrations.md`.

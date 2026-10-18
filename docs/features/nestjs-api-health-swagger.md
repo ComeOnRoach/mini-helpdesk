@@ -9,7 +9,7 @@ The API skeleton in `apps/api`: NestJS with strict TypeScript, validated configu
 - `src/main.ts` — bootstrap: global prefix, CORS, Swagger
 - `src/app.module.ts` — `ConfigModule` (global) + `HealthModule`
 - `src/config/env.validation.ts` — fails startup with a readable message if a required variable is missing or invalid
-- `src/health/` — controller, DTO and DB indicator
+- `src/health/` — controller and response DTO
 
 ## Endpoints
 
@@ -25,8 +25,7 @@ All future business endpoints live under the `/api` prefix; only `/health` is ex
 - `200` → `{ "status": "ok", "db": "up" }`
 - `503` → `{ "status": "error", "db": "down" }` when MySQL is unreachable (2 s connect timeout, 3 s overall)
 
-The DB check is a custom Terminus indicator that opens a `mysql2` connection and runs `SELECT 1`.
-It is temporary: T1.1 replaces it with `TypeOrmHealthIndicator`.
+The DB check is Terminus `TypeOrmHealthIndicator.pingCheck("db")` with a 3 s timeout (since T1.1).
 
 ## Configuration
 
