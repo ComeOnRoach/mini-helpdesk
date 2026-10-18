@@ -46,14 +46,15 @@ services:
       db:
         condition: service_healthy
 
-  # Placeholder command until T0.4 (Vite): then use `npm run dev -w apps/web -- --host`.
   web:
     image: node:20
     working_dir: /app
     command:
       - sh
       - -c
-      - echo "web placeholder - Vite arrives in T0.4" && tail -f /dev/null
+      - npm install && npm run dev -w apps/web -- --host
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
     ports:
       - '5173:5173'
     volumes:

@@ -17,11 +17,10 @@ One command brings up the local environment: `cp .env.example .env && docker com
 - **Source mount:** the repo is bind-mounted to `/app`; `node_modules` is a separate named volume so host modules do not leak in.
 - **Override:** `docker-compose.override.yml` is loaded automatically and enables polling file watchers (needed on Windows bind mounts).
 
-## Placeholders
+## Notes
 
-`web` runs a placeholder command because Vite (T0.4) does not exist yet. `api` runs NestJS since T0.3.
-Replace it with `npm run dev -w apps/web -- --host`.
-Dockerfiles come in T8.3.
+`api` runs NestJS (T0.3) and `web` runs the Vite dev server with `--host` (T0.4).
+Dockerfiles and the production nginx build come in T8.3.
 
 ## Variables
 
