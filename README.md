@@ -149,3 +149,5 @@ Details: `docs/features/seed.md`. Login itself arrives with T2.1.
 
 Send the token as `Authorization: Bearer <token>`. Lifetime is set by `JWT_EXPIRES_IN`. The API uses
 the `/api` prefix (only `/health` and `/docs` are outside it). Details: `docs/features/auth-register-login.md`.
+
+Errors always look like `{ statusCode, error, message, path, timestamp }` (`/health` 503 is the one exception). See `docs/features/validation-error-format.md`.
