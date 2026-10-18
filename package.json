@@ -1,0 +1,32 @@
+{
+  "name": "mini-helpdesk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mini Helpdesk: a ticketing system pet project",
+  "homepage": "https://github.com/ComeOnRoach/mini-helpdesk#readme",
+  "bugs": {
+    "url": "https://github.com/ComeOnRoach/mini-helpdesk/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ComeOnRoach/mini-helpdesk.git"
+  },
+  "license": "ISC",
+  "workspaces": [
+    "apps/api",
+    "apps/web"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
