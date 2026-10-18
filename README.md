@@ -141,11 +141,11 @@ Details: `docs/features/seed.md`. Login itself arrives with T2.1.
 
 ## Authentication
 
-| Method | Path                 | Auth   | Result                                     |
-| ------ | -------------------- | ------ | ------------------------------------------ |
-| POST   | `/api/auth/register` | public | Creates a `user`; 409 if the email exists  |
-| POST   | `/api/auth/login`    | public | `{ accessToken, user }`; 401 on bad login  |
-| GET    | `/api/auth/me`       | Bearer | The current user                           |
+| Method | Path                 | Auth   | Result                                    |
+| ------ | -------------------- | ------ | ----------------------------------------- |
+| POST   | `/api/auth/register` | public | Creates a `user`; 409 if the email exists |
+| POST   | `/api/auth/login`    | public | `{ accessToken, user }`; 401 on bad login |
+| GET    | `/api/auth/me`       | Bearer | The current user                          |
 
 Send the token as `Authorization: Bearer <token>`. Lifetime is set by `JWT_EXPIRES_IN`. The API uses
 the `/api` prefix (only `/health` and `/docs` are outside it). Details: `docs/features/auth-register-login.md`.

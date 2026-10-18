@@ -2,11 +2,11 @@
 
 ## Endpoints
 
-| Method | Path                 | Body                | Success                  | Errors                      |
-| ------ | -------------------- | ------------------- | ------------------------ | --------------------------- |
-| POST   | `/api/auth/register` | `{ email, password }` | 201 user (no token)    | 400 validation, 409 duplicate |
-| POST   | `/api/auth/login`    | `{ email, password }` | 200 `{ accessToken, user }` | 400, 401 wrong email or password |
-| GET    | `/api/auth/me`       | header `Authorization: Bearer <token>` | 200 user | 401 missing/invalid/expired token |
+| Method | Path                 | Body                                   | Success                     | Errors                            |
+| ------ | -------------------- | -------------------------------------- | --------------------------- | --------------------------------- |
+| POST   | `/api/auth/register` | `{ email, password }`                  | 201 user (no token)         | 400 validation, 409 duplicate     |
+| POST   | `/api/auth/login`    | `{ email, password }`                  | 200 `{ accessToken, user }` | 400, 401 wrong email or password  |
+| GET    | `/api/auth/me`       | header `Authorization: Bearer <token>` | 200 user                    | 401 missing/invalid/expired token |
 
 The user object is `{ id, email, role, createdAt }`. The password and the hash are never returned
 (`User.passwordHash` is `select: false`; login loads it explicitly in `UsersService`).
