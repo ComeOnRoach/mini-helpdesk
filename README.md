@@ -122,3 +122,18 @@ npm run migration:revert -w apps/api
 ```
 
 See `docs/features/typeorm-mysql-migrations.md`. The data model and ER diagram are in `docs/features/entities.md`.
+
+## Seed data
+
+```bash
+npm run seed -w apps/api                          # or: docker compose exec api npm run seed -w apps/api
+```
+
+Creates 2 users and 12 tickets with comments; running it again changes nothing. Development accounts:
+
+| Email               | Password    | Role    |
+| ------------------- | ----------- | ------- |
+| `user@example.com`  | `User123!`  | `user`  |
+| `agent@example.com` | `Agent123!` | `agent` |
+
+Details: `docs/features/seed.md`. Login itself arrives with T2.1.
