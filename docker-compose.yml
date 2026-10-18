@@ -35,6 +35,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-helpdesk}
       DB_NAME: ${DB_NAME:-helpdesk}
       JWT_SECRET: ${JWT_SECRET:-change-me}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
       PORT: ${PORT:-3000}
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:5173}
     ports:

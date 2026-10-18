@@ -96,6 +96,7 @@ mini-helpdesk/
 | `DB_ROOT_PASSWORD` | `root`                  | MySQL root password (used by the image and healthcheck) |
 | `DB_NAME`          | `helpdesk`              | Database name                                           |
 | `JWT_SECRET`       | `change-me`             | JWT signing secret                                      |
+| `JWT_EXPIRES_IN`   | `1h`                    | Access token lifetime (`15m`, `1h`, `7d`)               |
 | `NODE_ENV`         | `development`           | Runtime environment                                     |
 | `PORT`             | `3000`                  | API listen port                                         |
 | `VITE_API_URL`     | `http://localhost:3000` | API base URL used by the web app                        |
@@ -137,3 +138,14 @@ Creates 2 users and 12 tickets with comments; running it again changes nothing. 
 | `agent@example.com` | `Agent123!` | `agent` |
 
 Details: `docs/features/seed.md`. Login itself arrives with T2.1.
+
+## Authentication
+
+| Method | Path                 | Auth   | Result                                    |
+| ------ | -------------------- | ------ | ----------------------------------------- |
+| POST   | `/api/auth/register` | public | Creates a `user`; 409 if the email exists |
+| POST   | `/api/auth/login`    | public | `{ accessToken, user }`; 401 on bad login |
+| GET    | `/api/auth/me`       | Bearer | The current user                          |
+
+Send the token as `Authorization: Bearer <token>`. Lifetime is set by `JWT_EXPIRES_IN`. The API uses
+the `/api` prefix (only `/health` and `/docs` are outside it). Details: `docs/features/auth-register-login.md`.
