@@ -2,8 +2,23 @@
   "name": "@helpdesk/web",
   "version": "0.0.0",
   "private": true,
-  "description": "Mini Helpdesk web (React + Vite, added in T0.4)",
+  "description": "Mini Helpdesk web (React + Vite)",
+  "type": "module",
   "scripts": {
-    "build": "echo \"web: nothing to build yet\""
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "~5.9.3",
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.4"
   }
 }
