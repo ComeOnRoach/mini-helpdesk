@@ -1,0 +1,9 @@
+{
+  "name": "@helpdesk/web",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Mini Helpdesk web (React + Vite, added in T0.4)",
+  "scripts": {
+    "build": "echo \"web: nothing to build yet\""
+  }
+}

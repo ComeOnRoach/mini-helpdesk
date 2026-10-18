@@ -1,0 +1,9 @@
+{
+  "name": "@helpdesk/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Mini Helpdesk API (NestJS, added in T0.3)",
+  "scripts": {
+    "build": "echo \"api: nothing to build yet\""
+  }
+}
