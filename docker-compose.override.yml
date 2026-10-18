@@ -1,0 +1,8 @@
+# Dev overrides: loaded automatically by `docker compose up`.
+services:
+  api:
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
+  web:
+    environment:
+      CHOKIDAR_USEPOLLING: 'true'
