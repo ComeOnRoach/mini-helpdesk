@@ -1,9 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService, TypeOrmHealthIndicator } from '@nestjs/terminus';
+import { Public } from '../common/decorators/public.decorator';
 import { HealthUnavailableException } from '../common/all-exceptions.filter';
 import { HealthResponseDto } from './health-response.dto';
 
+@Public()
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
