@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
+import { config } from 'dotenv';
 import { validateEnv } from '../config/env.validation';
 import { DatabaseModule } from '../database/database.module';
 import { SeedModule } from './seed.module';
@@ -21,6 +22,9 @@ import { SeedService } from './seed.service';
 class SeedCliModule {}
 
 async function main(): Promise<void> {
+  // Load the same env files as ConfigModule (process env wins) so NODE_ENV set only in .env is seen,
+  // and refuse before the app connects to the database or runs migrations.
+  config({ path: ['.env', '../../.env'], quiet: true });
   if (process.env.NODE_ENV === 'production') {
     throw new Error(
       'Refusing to seed: the seed accounts have known passwords (NODE_ENV=production)',

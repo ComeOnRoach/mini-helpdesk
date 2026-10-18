@@ -12,6 +12,8 @@ export function buildDataSourceOptions(get: (key: string) => string): DataSource
     password: get('DB_PASSWORD'),
     database: get('DB_NAME'),
     charset: 'utf8mb4',
+    // Dates are stored and read as UTC regardless of the machine's time zone (deterministic seed).
+    timezone: 'Z',
     entities: [join(__dirname, '..', '**', '*.entity.{ts,js}')],
     migrations: [join(__dirname, '..', 'migrations', '*.{ts,js}')],
     synchronize: false,

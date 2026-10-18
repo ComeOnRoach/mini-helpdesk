@@ -25,7 +25,7 @@ docker compose exec api npm run seed -w apps/api  # inside the running stack
 ```
 
 The seed runs pending migrations first, so it also works on an empty database.
-It refuses to run when `NODE_ENV=production`, because the accounts have known passwords.
+It refuses to run when `NODE_ENV=production` (also when it is set only in `.env`), because the accounts have known passwords. Dates are stored as UTC (`timezone: 'Z'` in the TypeORM options), so a host seed and a container seed produce identical data.
 
 ## Idempotency
 
