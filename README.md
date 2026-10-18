@@ -137,7 +137,7 @@ Creates 2 users and 12 tickets with comments; running it again changes nothing. 
 | `user@example.com`  | `User123!`  | `user`  |
 | `agent@example.com` | `Agent123!` | `agent` |
 
-Details: `docs/features/seed.md`. Login itself arrives with T2.1.
+Details: `docs/features/seed.md`. You can log in with them at http://localhost:5173/login.
 
 ## Authentication
 
@@ -166,3 +166,5 @@ required role gives 403.
 
 The ticket rules are enforced by the ticket endpoints (T3.x) using `canAccessTicket()` and `@Roles()`.
 Details: `docs/features/jwt-and-role-guards.md`.
+
+Web: `/login` and `/register`; `/tickets` needs a login. The token is kept in `localStorage` (`token`). See `docs/features/frontend-auth.md`.

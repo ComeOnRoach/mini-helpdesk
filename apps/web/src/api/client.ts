@@ -1,4 +1,7 @@
-const TOKEN_KEY = 'token';
+export const TOKEN_KEY = 'token';
+
+// A 401 from these calls means "wrong credentials", not "session expired": the form shows it.
+const NO_REDIRECT_ON_401 = ['/api/auth/login', '/api/auth/register'];
 
 export class ApiError extends Error {
   constructor(
@@ -22,7 +25,7 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
 
   const response = await fetch(`${import.meta.env.VITE_API_URL}${path}`, { ...init, headers });
 
-  if (response.status === 401) {
+  if (response.status === 401 && !NO_REDIRECT_ON_401.includes(path)) {
     localStorage.removeItem(TOKEN_KEY);
     window.location.assign('/login');
     throw new ApiError(401, 'Unauthorized');
