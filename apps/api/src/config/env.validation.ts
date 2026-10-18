@@ -22,6 +22,14 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
     errors.push(`NODE_ENV must be one of: ${NODE_ENVS.join(', ')}`);
   }
 
+  const expires = config.JWT_EXPIRES_IN;
+  if (
+    expires !== undefined &&
+    (typeof expires !== 'string' || !/^\d+(ms|s|m|h|d|w|y)?$/.test(expires))
+  ) {
+    errors.push('JWT_EXPIRES_IN must look like 15m, 1h or 7d');
+  }
+
   if (errors.length > 0) {
     throw new Error(`Invalid environment configuration:\n - ${errors.join('\n - ')}`);
   }
