@@ -121,4 +121,4 @@ npm run migration:run -w apps/api
 npm run migration:revert -w apps/api
 ```
 
-See `docs/features/typeorm-mysql-migrations.md`.
+See `docs/features/typeorm-mysql-migrations.md`. The data model and ER diagram are in `docs/features/entities.md`.
