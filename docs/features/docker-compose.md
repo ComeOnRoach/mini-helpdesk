@@ -19,8 +19,8 @@ One command brings up the local environment: `cp .env.example .env && docker com
 
 ## Placeholders
 
-`api` and `web` run placeholder commands because NestJS (T0.3) and Vite (T0.4) do not exist yet.
-Replace them with `npm run start:dev -w apps/api` and `npm run dev -w apps/web -- --host`.
+`web` runs a placeholder command because Vite (T0.4) does not exist yet. `api` runs NestJS since T0.3.
+Replace it with `npm run dev -w apps/web -- --host`.
 Dockerfiles come in T8.3.
 
 ## Variables

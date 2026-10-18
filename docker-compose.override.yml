@@ -1,8 +1,11 @@
 # Dev overrides: loaded automatically by `docker compose up`.
+# File-change events do not cross the Windows bind mount, so watchers must poll.
 services:
   api:
     environment:
       CHOKIDAR_USEPOLLING: 'true'
+      TSC_WATCHFILE: PriorityPollingInterval
+      TSC_WATCHDIRECTORY: DynamicPriorityPolling
   web:
     environment:
       CHOKIDAR_USEPOLLING: 'true'
