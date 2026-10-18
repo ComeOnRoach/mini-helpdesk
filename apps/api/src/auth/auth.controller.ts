@@ -1,17 +1,21 @@
-import { Body, Controller, Get, Headers, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { ErrorResponseDto } from '../common/error-response.dto';
 import { AuthService } from './auth.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import { User } from '../users/user.entity';
+import { toUserResponse, UserResponseDto } from './dto/user-response.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
+  @Public()
   @Post('register')
   @ApiOperation({ summary: 'Register a new user (role: user)' })
   @ApiResponse({ status: 201, description: 'User created', type: UserResponseDto })
@@ -21,6 +25,7 @@ export class AuthController {
     return this.auth.register(dto);
   }
 
+  @Public()
   @Post('login')
   @HttpCode(200)
   @ApiOperation({ summary: 'Log in and get an access token' })
@@ -40,7 +45,7 @@ export class AuthController {
     description: 'Missing, invalid or expired token',
     type: ErrorResponseDto,
   })
-  me(@Headers('authorization') authorization?: string): Promise<UserResponseDto> {
-    return this.auth.me(authorization);
+  me(@CurrentUser() user: User): UserResponseDto {
+    return toUserResponse(user);
   }
 }

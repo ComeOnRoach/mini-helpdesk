@@ -2,12 +2,11 @@ import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserRole } from '../common/enums';
-import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { UserResponseDto } from './dto/user-response.dto';
+import { toUserResponse, UserResponseDto } from './dto/user-response.dto';
 
 const BCRYPT_ROUNDS = 10;
 // Compared against when the email is unknown, so both login failures take similar time.
@@ -50,27 +49,4 @@ export class AuthService {
     const payload: JwtPayload = { sub: user.id, role: user.role };
     return { accessToken: await this.jwt.signAsync(payload), user: toUserResponse(user) };
   }
-
-  // Temporary bearer check; T2.2 replaces it with JwtAuthGuard + @CurrentUser().
-  async me(authorization: string | undefined): Promise<UserResponseDto> {
-    const token = authorization?.startsWith('Bearer ') ? authorization.slice(7) : undefined;
-    if (!token) {
-      throw new UnauthorizedException('Missing bearer token');
-    }
-    let payload: JwtPayload;
-    try {
-      payload = await this.jwt.verifyAsync<JwtPayload>(token);
-    } catch {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
-    const user = await this.users.findById(payload.sub);
-    if (!user) {
-      throw new UnauthorizedException('Invalid or expired token');
-    }
-    return toUserResponse(user);
-  }
-}
-
-function toUserResponse(user: User): UserResponseDto {
-  return { id: user.id, email: user.email, role: user.role, createdAt: user.createdAt };
 }
