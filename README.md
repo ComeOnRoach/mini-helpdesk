@@ -149,3 +149,20 @@ Details: `docs/features/seed.md`. Login itself arrives with T2.1.
 
 Send the token as `Authorization: Bearer <token>`. Lifetime is set by `JWT_EXPIRES_IN`. The API uses
 the `/api` prefix (only `/health` and `/docs` are outside it). Details: `docs/features/auth-register-login.md`.
+
+Errors always look like `{ statusCode, error, message, path, timestamp }` (`/health` 503 is the one exception). See `docs/features/validation-error-format.md`.
+
+## Roles and access
+
+Every route requires a valid Bearer token unless it is marked `@Public()` (`/api/auth/register`,
+`/api/auth/login`, `/health`). A missing, invalid or expired token gives 401; a valid token without the
+required role gives 403.
+
+| Action                              | `user`         | `agent` |
+| ----------------------------------- | -------------- | ------- |
+| Register, log in, `GET /auth/me`    | yes            | yes     |
+| See and edit tickets                | only their own | all     |
+| Change ticket `status` and assignee | no             | yes     |
+
+The ticket rules are enforced by the ticket endpoints (T3.x) using `canAccessTicket()` and `@Roles()`.
+Details: `docs/features/jwt-and-role-guards.md`.
