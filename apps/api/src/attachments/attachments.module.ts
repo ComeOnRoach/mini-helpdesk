@@ -9,6 +9,7 @@ import { StorageModule } from '../storage/storage.module';
 import { TicketsModule } from '../tickets/tickets.module';
 import { Attachment } from './attachment.entity';
 import { ALLOWED_EXTENSIONS, isAllowedFile } from './attachment-types';
+import { AttachmentDownloadController } from './attachment-download.controller';
 import { AttachmentsController } from './attachments.controller';
 import { AttachmentsService } from './attachments.service';
 
@@ -44,7 +45,7 @@ import { AttachmentsService } from './attachments.service';
       }),
     }),
   ],
-  controllers: [AttachmentsController],
+  controllers: [AttachmentsController, AttachmentDownloadController],
   providers: [AttachmentsService],
 })
 export class AttachmentsModule {}

@@ -1,4 +1,4 @@
-import { apiFetch } from './client';
+import { apiFetch, apiFetchBlob } from './client';
 
 export interface Attachment {
   id: number;
@@ -19,3 +19,6 @@ export const uploadAttachment = (ticketId: number | string, file: File) => {
 
 export const deleteAttachment = (ticketId: number | string, attachmentId: number) =>
   apiFetch<void>(`/api/tickets/${ticketId}/attachments/${attachmentId}`, { method: 'DELETE' });
+
+export const downloadAttachment = (attachmentId: number) =>
+  apiFetchBlob(`/api/attachments/${attachmentId}/download`);

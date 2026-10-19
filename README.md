@@ -171,7 +171,7 @@ Details: `docs/features/jwt-and-role-guards.md`.
 
 Web: `/login` and `/register`; `/tickets` needs a login. The token is kept in `localStorage` (`token`). See `docs/features/frontend-auth.md`.
 
-Attachments: `POST /api/tickets/:id/attachments` (multipart field `file`; png, jpg, pdf, txt, csv; up to `MAX_UPLOAD_BYTES`, 5 MB by default) and `DELETE /api/tickets/:id/attachments/:attachmentId`. A user works only with their own tickets (others answer 404), an agent with any. Too large gives 413, a wrong type 415. Files live in `UPLOAD_DIR` (compose volume `uploads_data`). See `docs/features/attachments.md`.
+Attachments: `POST /api/tickets/:id/attachments` (multipart field `file`; png, jpg, pdf, txt, csv; up to `MAX_UPLOAD_BYTES`, 5 MB by default) `DELETE /api/tickets/:id/attachments/:attachmentId` and `GET /api/attachments/:id/download` (original file name, `Content-Disposition: attachment`). A user works only with their own tickets (others answer 404), an agent with any. Too large gives 413, a wrong type 415. Files live in `UPLOAD_DIR` (compose volume `uploads_data`). See `docs/features/attachments.md`.
 
 Tickets: `GET /api/tickets?page=1&limit=10&status=open&priority=high&tag=bug&q=text&sort=createdAt:desc` (login required; users see their own tickets, agents all). See `docs/features/tickets-list.md`.
 

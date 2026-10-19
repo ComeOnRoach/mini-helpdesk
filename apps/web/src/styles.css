@@ -309,6 +309,10 @@ button.danger {
 }
 
 .attachments button {
+  margin-left: 0;
+}
+
+.attachments .attachment-download {
   margin-left: auto;
 }
 

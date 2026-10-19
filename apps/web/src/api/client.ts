@@ -13,7 +13,8 @@ export class ApiError extends Error {
   }
 }
 
-export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+// Sends the request with the token and turns a failure into an ApiError.
+async function request(path: string, init: RequestInit): Promise<Response> {
   const headers = new Headers(init.headers);
   // FormData must keep the browser's multipart Content-Type (it carries the boundary).
   if (init.body !== undefined && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
@@ -36,5 +37,16 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
     const message = Array.isArray(body?.message) ? body.message.join(', ') : body?.message;
     throw new ApiError(response.status, message ?? response.statusText);
   }
+  return response;
+}
+
+export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await request(path, init);
   return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
+}
+
+// For binary answers (file downloads); a plain link cannot send the Authorization header.
+export async function apiFetchBlob(path: string): Promise<Blob> {
+  const response = await request(path, {});
+  return response.blob();
 }
