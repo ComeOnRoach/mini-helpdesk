@@ -11,6 +11,7 @@ import { AttachmentsSection } from '../../components/attachments-section';
 import { ConfirmModal } from '../../components/confirm-modal';
 import { Pagination } from '../../components/pagination';
 import { EmptyState, ErrorState, LoadingState } from '../../components/state-views';
+import { useRealtimeEvent } from '../../components/use-realtime';
 import { useToast } from '../../components/use-toast';
 import { errorMessage, validateCommentBody } from './validation';
 
@@ -79,6 +80,13 @@ export function TicketDetailsPage() {
     };
     // Depend on the ticket id, not the object, so a status change does not reload comments.
   }, [id, commentPage, commentsKey, ticket?.id]);
+
+  // A comment from someone else (or from my other tab) shows up without a reload, and after a
+  // reconnect the list is reloaded in case something arrived while the socket was down.
+  useRealtimeEvent('comment.added', (payload) => {
+    if (String(payload.ticketId) === id) setCommentsKey((k) => k + 1);
+  });
+  useRealtimeEvent('reconnected', () => setCommentsKey((k) => k + 1));
 
   const onStatusChange = useCallback(
     async (status: TicketStatus) => {
