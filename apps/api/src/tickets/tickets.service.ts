@@ -5,13 +5,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Attachment } from '../attachments/attachment.entity';
 import { FileStorageService } from '../storage/file-storage.service';
 import { TicketPriority, TicketStatus, UserRole } from '../common/enums';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
+import { toCsv } from '../common/csv';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { ExportTicketsQueryDto } from './dto/export-tickets-query.dto';
 import { TicketDetailResponseDto } from './dto/ticket-detail-response.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { canAccessTicket, canDeleteTicket } from './ticket-access';
@@ -39,11 +41,13 @@ export class TicketsService {
     private readonly storage: FileStorageService,
   ) {}
 
-  async list(user: User, query: ListTicketsQueryDto): Promise<TicketListResponseDto> {
-    // Defaults are applied here because an empty query value ("?page=") arrives as undefined.
+  // Shared by the list and the CSV export, so both always return the same tickets.
+  private filteredQuery(
+    user: User,
+    query: Omit<ListTicketsQueryDto, 'page' | 'limit'>,
+  ): SelectQueryBuilder<Ticket> {
+    // Defaults are applied here because an empty query value ("?sort=") arrives as undefined.
     const { status, priority, tag, q } = query;
-    const page = query.page ?? DEFAULT_PAGE;
-    const limit = query.limit ?? DEFAULT_LIMIT;
     const [field, direction] = (query.sort ?? DEFAULT_SORT).split(':') as [
       SortField,
       'asc' | 'desc',
@@ -76,13 +80,38 @@ export class TicketsService {
     if (field !== 'id') {
       qb.addOrderBy('ticket.id', 'DESC');
     }
+    return qb;
+  }
 
-    const [items, total] = await qb
+  async list(user: User, query: ListTicketsQueryDto): Promise<TicketListResponseDto> {
+    const page = query.page ?? DEFAULT_PAGE;
+    const limit = query.limit ?? DEFAULT_LIMIT;
+
+    const [items, total] = await this.filteredQuery(user, query)
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
 
     return { items, total, page, limit };
+  }
+
+  // All tickets matching the filters (no paging), as CSV text.
+  async exportCsv(user: User, query: ExportTicketsQueryDto): Promise<string> {
+    const tickets = await this.filteredQuery(user, query)
+      .leftJoinAndSelect('ticket.createdBy', 'creator')
+      .getMany();
+    return toCsv(
+      ['id', 'title', 'status', 'priority', 'tags', 'createdBy', 'createdAt'],
+      tickets.map((ticket) => [
+        ticket.id,
+        ticket.title,
+        ticket.status,
+        ticket.priority,
+        ticket.tags.join(';'),
+        ticket.createdBy.email,
+        ticket.createdAt.toISOString(),
+      ]),
+    );
   }
 
   create(user: User, dto: CreateTicketDto): Promise<TicketResponseDto> {

@@ -1,5 +1,5 @@
 import type { Attachment } from './attachments';
-import { apiFetch } from './client';
+import { apiFetchBlob, apiFetch } from './client';
 
 export type TicketStatus = 'open' | 'in_progress' | 'closed';
 export type TicketPriority = 'low' | 'medium' | 'high';
@@ -63,6 +63,10 @@ function toQueryString(query: TicketListQuery): string {
 
 export const listTickets = (query: TicketListQuery) =>
   apiFetch<Paginated<Ticket>>(`/api/tickets${toQueryString({ limit: PAGE_LIMIT, ...query })}`);
+
+// The CSV of the tickets matching the filters (all pages, so no page or limit).
+export const exportTickets = (query: Omit<TicketListQuery, 'page' | 'limit'>) =>
+  apiFetchBlob(`/api/tickets/export${toQueryString(query)}`);
 
 export const getTicket = (id: number | string) => apiFetch<TicketDetails>(`/api/tickets/${id}`);
 

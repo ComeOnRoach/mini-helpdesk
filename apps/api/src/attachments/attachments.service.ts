@@ -2,11 +2,11 @@ import { BadRequestException, Injectable, NotFoundException, StreamableFile } fr
 import { InjectRepository } from '@nestjs/typeorm';
 import { basename } from 'node:path';
 import { Repository } from 'typeorm';
+import { contentDisposition } from '../common/content-disposition';
 import { FileStorageService } from '../storage/file-storage.service';
 import { TicketsService } from '../tickets/tickets.service';
 import { User } from '../users/user.entity';
 import { Attachment } from './attachment.entity';
-import { contentDisposition } from './content-disposition';
 import { AttachmentResponseDto } from './dto/attachment-response.dto';
 
 const MAX_NAME_LENGTH = 255;

@@ -9,12 +9,17 @@ import {
   Patch,
   Post,
   Query,
+  Res,
+  StreamableFile,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
+import { contentDisposition } from '../common/content-disposition';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { ErrorResponseDto } from '../common/error-response.dto';
 import { User } from '../users/user.entity';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { ExportTicketsQueryDto } from './dto/export-tickets-query.dto';
 import { ListTicketsQueryDto } from './dto/list-tickets-query.dto';
 import { TicketDetailResponseDto } from './dto/ticket-detail-response.dto';
 import { TicketListResponseDto, TicketResponseDto } from './dto/ticket-response.dto';
@@ -47,6 +52,34 @@ export class TicketsController {
     @Query() query: ListTicketsQueryDto,
   ): Promise<TicketListResponseDto> {
     return this.tickets.list(user, query);
+  }
+
+  // Declared before :id, otherwise "export" would be read as a ticket id.
+  @Get('export')
+  @ApiOperation({
+    summary: 'Export tickets as CSV',
+    description:
+      'Same filters and sort as the list, without paging. Columns: id, title, status, priority, tags (joined with ";"), createdBy (email), createdAt. ' +
+      'UTF-8 with BOM so Excel opens it correctly. An agent exports all tickets, a user only their own.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'CSV file, tickets-YYYY-MM-DD.csv',
+    content: { 'text/csv': { schema: { type: 'string' } } },
+  })
+  @ApiResponse({ status: 400, description: 'Invalid query parameter', type: ErrorResponseDto })
+  @ApiResponse(UNAUTHORIZED)
+  async export(
+    @CurrentUser() user: User,
+    @Query() query: ExportTicketsQueryDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<StreamableFile> {
+    const csv = await this.tickets.exportCsv(user, query);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    return new StreamableFile(Buffer.from(csv, 'utf8'), {
+      type: 'text/csv; charset=utf-8',
+      disposition: contentDisposition(`tickets-${new Date().toISOString().slice(0, 10)}.csv`),
+    });
   }
 
   @Post()

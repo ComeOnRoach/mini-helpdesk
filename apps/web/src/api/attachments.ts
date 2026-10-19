@@ -20,5 +20,5 @@ export const uploadAttachment = (ticketId: number | string, file: File) => {
 export const deleteAttachment = (ticketId: number | string, attachmentId: number) =>
   apiFetch<void>(`/api/tickets/${ticketId}/attachments/${attachmentId}`, { method: 'DELETE' });
 
-export const downloadAttachment = (attachmentId: number) =>
-  apiFetchBlob(`/api/attachments/${attachmentId}/download`);
+export const downloadAttachment = async (attachmentId: number) =>
+  (await apiFetchBlob(`/api/attachments/${attachmentId}/download`)).blob;
