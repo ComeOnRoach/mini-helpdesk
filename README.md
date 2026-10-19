@@ -171,6 +171,8 @@ Details: `docs/features/jwt-and-role-guards.md`.
 
 Web: `/login` and `/register`; `/tickets` needs a login. The token is kept in `localStorage` (`token`). See `docs/features/frontend-auth.md`.
 
+Print page: `/tickets/:id/print` (web route without header or navigation; all comments and attachments; `Print / Save as PDF` button calls `window.print()`, A4 `@media print` styles). See `docs/features/ticket-print.md`.
+
 CSV export: `GET /api/tickets/export?status=open&priority=high&tag=bug&q=text&sort=createdAt:desc` (the list filters, no paging; UTF-8 with BOM, file `tickets-YYYY-MM-DD.csv`; users export their own tickets, agents all). See `docs/features/tickets-export-csv.md`.
 
 Attachments: `POST /api/tickets/:id/attachments` (multipart field `file`; png, jpg, pdf, txt, csv; up to `MAX_UPLOAD_BYTES`, 5 MB by default) `DELETE /api/tickets/:id/attachments/:attachmentId` and `GET /api/attachments/:id/download` (original file name, `Content-Disposition: attachment`). A user works only with their own tickets (others answer 404), an agent with any. Too large gives 413, a wrong type 415. Files live in `UPLOAD_DIR` (compose volume `uploads_data`). See `docs/features/attachments.md`.

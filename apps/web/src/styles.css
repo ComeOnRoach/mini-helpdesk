@@ -320,3 +320,90 @@ button.danger {
   color: #52606d;
   font-size: 0.875rem;
 }
+
+.print-page {
+  max-width: 794px;
+  margin: 16px auto;
+  padding: 24px 32px;
+  border: 1px solid #d9e0e7;
+  background: #fff;
+}
+
+.print-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.print-kicker,
+.print-footer {
+  color: #52606d;
+  font-size: 0.875rem;
+}
+
+.print-list {
+  padding-left: 20px;
+}
+
+.print-page .description,
+.print-page .comments p {
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  .no-print,
+  .toasts {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .print-page {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .print-page * {
+    color: #000 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .print-page a {
+    text-decoration: none;
+  }
+
+  .print-page h1 {
+    font-size: 20pt;
+  }
+
+  .print-page h2 {
+    font-size: 14pt;
+    break-after: avoid;
+  }
+
+  .print-page .comments li,
+  .print-page .print-list li {
+    break-inside: avoid;
+    border-color: #000;
+  }
+
+  .print-page .details {
+    break-inside: avoid;
+  }
+}

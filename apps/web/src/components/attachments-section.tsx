@@ -7,17 +7,12 @@ import {
   uploadAttachment,
 } from '../api/attachments';
 import type { Attachment } from '../api/attachments';
+import { formatSize } from '../lib/format-size';
 import { saveBlob } from '../lib/save-blob';
 import { errorMessage, validateFile } from '../pages/tickets/validation';
 import { ConfirmModal } from './confirm-modal';
 import { EmptyState } from './state-views';
 import { useToast } from './use-toast';
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 interface AttachmentsSectionProps {
   ticketId: number;
