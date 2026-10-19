@@ -1,12 +1,14 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { ToastContext } from './toast-context';
-import type { ToastType } from './toast-context';
+import type { ToastLink, ToastType } from './toast-context';
 
 interface ToastItem {
   id: number;
   type: ToastType;
   message: string;
+  link?: ToastLink;
 }
 
 const TOAST_MS = 4000;
@@ -20,9 +22,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const push = useCallback(
-    (type: ToastType, message: string) => {
+    (type: ToastType, message: string, link?: ToastLink) => {
       const id = nextId.current++;
-      setToasts((current) => [...current, { id, type, message }]);
+      setToasts((current) => [...current, { id, type, message, link }]);
       window.setTimeout(() => dismiss(id), TOAST_MS);
     },
     [dismiss],
@@ -32,6 +34,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     () => ({
       success: (message: string) => push('success', message),
       error: (message: string) => push('error', message),
+      info: (message: string, link?: ToastLink) => push('info', message, link),
     }),
     [push],
   );
@@ -49,6 +52,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             data-toast-type={toast.type}
           >
             <span data-testid="toast-message">{toast.message}</span>
+            {toast.link && (
+              <Link to={toast.link.to} onClick={() => dismiss(toast.id)} data-testid="toast-link">
+                {toast.link.label}
+              </Link>
+            )}
             <button
               type="button"
               className="toast-close"

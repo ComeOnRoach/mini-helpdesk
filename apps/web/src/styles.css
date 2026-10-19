@@ -407,3 +407,48 @@ button.danger {
     break-inside: avoid;
   }
 }
+
+.toast-info {
+  background: #1d4ed8;
+}
+
+.toast a {
+  color: #fff;
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-block;
+  min-width: 20px;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #b91c1c;
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 20px;
+  text-align: center;
+}
+
+.connection {
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #e5e7eb;
+  font-size: 0.75rem;
+}
+
+.connection[data-status='online'] {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.connection[data-status='reconnecting'],
+.connection[data-status='connecting'] {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.connection[data-status='offline'] {
+  background: #fee2e2;
+  color: #991b1b;
+}

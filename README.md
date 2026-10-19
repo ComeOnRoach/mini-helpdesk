@@ -215,6 +215,8 @@ Socket.IO on the API port (`ws://localhost:3000/socket.io/`). Full description: 
 
 A socket in several of these rooms gets the event once.
 
+**In the web app** (`docs/features/realtime-ui.md`): the socket opens after login and closes on logout; a toast "New comment on ticket #N" with a link, an unread badge on the Tickets link (`nav-unread-badge`, reset when the ticket is opened), live comments on the open ticket page, and a connection indicator (`nav-connection`, `data-status` = `connecting` / `online` / `reconnecting` / `offline`).
+
 ## Test locators (data-testid)
 
 Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).
