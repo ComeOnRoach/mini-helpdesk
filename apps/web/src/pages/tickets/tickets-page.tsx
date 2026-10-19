@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
@@ -12,6 +12,7 @@ import type { Paginated, Ticket } from '../../api/tickets';
 import { Pagination } from '../../components/pagination';
 import { EmptyState, ErrorState, LoadingState } from '../../components/state-views';
 import { useToast } from '../../components/use-toast';
+import { track } from '../../lib/analytics';
 import { saveBlob } from '../../lib/save-blob';
 import { errorMessage } from './validation';
 
@@ -69,6 +70,15 @@ export function TicketsPage() {
     return () => window.clearTimeout(timer);
   }, [tagInput, searchInput, tag, q, updateParams]);
 
+  // The URL `q` only changes after the debounce. Comparing with the previous value (not a
+  // "first run" flag) also keeps the initial mount and StrictMode's double effect silent.
+  const trackedQ = useRef(q);
+  useEffect(() => {
+    if (trackedQ.current === q) return;
+    trackedQ.current = q;
+    if (q !== '') track('search');
+  }, [q]);
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -97,6 +107,7 @@ export function TicketsPage() {
       // The export has no paging: it takes the current filters but not the page.
       const { blob, filename } = await exportTickets({ status, priority, tag, q });
       saveBlob(blob, filename ?? 'tickets.csv');
+      track('export');
       toast.success('CSV exported');
     } catch (caught) {
       toast.error(errorMessage(caught));

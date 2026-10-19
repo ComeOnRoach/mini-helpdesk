@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { track } from '../lib/analytics';
 import { loginRequest, meRequest, registerRequest } from '../api/auth';
 import type { User } from '../api/auth';
 import { TOKEN_KEY } from '../api/client';
@@ -29,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const result = await loginRequest(email, password);
     localStorage.setItem(TOKEN_KEY, result.accessToken);
     setUser(result.user);
+    track('login');
   }, []);
 
   const register = useCallback(
