@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/use-auth';
 import { NotificationControl } from './notification-control';
+import { ThemeToggle } from './theme-toggle';
 import { useRealtime } from './use-realtime';
 
 const STATUS_LABELS = {
@@ -88,6 +89,7 @@ export function Layout() {
             </NavLink>
           ))}
         </nav>
+        <ThemeToggle />
         {user && (
           <div className="session">
             <NotificationControl />

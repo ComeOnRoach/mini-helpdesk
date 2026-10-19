@@ -253,3 +253,7 @@ Every interactive element in the web app has a `data-testid`, so future Playwrig
 - **Pull requests:** use the checklist in `.github/pull_request_template.md`.
 
 More detail: `docs/features/data-testid.md`.
+
+## Theme switcher (`nav-theme-toggle`)
+
+The header button switches light/dark (`data-theme` on `<html>`, saved in `localStorage` key `theme`, default from `prefers-color-scheme`, print stays black on white); the Help widgets follow it. Details: `docs/features/theme-switcher.md`.
