@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { setupApp } from './common/app-setup';
+import { RealtimeIoAdapter } from './realtime/socket-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,6 +11,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api', { exclude: ['health'] });
   setupApp(app);
+  app.useWebSocketAdapter(new RealtimeIoAdapter(app));
   app.enableCors({
     origin: config.get<string>('WEB_ORIGIN', 'http://localhost:5173'),
     // Lets the web app read the file name of downloads.

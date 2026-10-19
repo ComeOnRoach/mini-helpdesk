@@ -197,6 +197,24 @@ Comments:
 
 Another user's ticket answers 404. Each new comment emits the internal event `comment.added` (payload in `docs/features/comments.md`) for the WebSocket gateway (T5.1). See `docs/features/comments.md`.
 
+## Real-time (WebSocket)
+
+Socket.IO on the API port (`ws://localhost:3000/socket.io/`). Full description: `docs/features/websocket-gateway.md`.
+
+**Connect** with the login token: `io(url, { auth: { token } })` (an `Authorization: Bearer <token>` header also works). A missing, invalid or expired token, or a deleted user, is rejected before the connection exists: the client gets `connect_error` with the message `Unauthorized`.
+
+**Rooms.** Every socket is in `user:<id>`; an agent is also in `agents`. Send `ticket.subscribe` `{ "ticketId": 5 }` to join `ticket:5` (and `ticket.unsubscribe` to leave). Both answer with an ack: `{ "ok": true }` or `{ "ok": false, "message": "..." }`. Someone else's ticket answers `Ticket not found`, like a missing one.
+
+**Server events** (a `user` only receives events of their own tickets; an agent receives all):
+
+| Event            | Sent to                                          | Payload                                                                 |
+| ---------------- | ------------------------------------------------ | ----------------------------------------------------------------------- |
+| `ticket.created` | `agents`, `user:<creator>`                       | `{ ticket }` (the ticket as `POST /api/tickets` returns it)             |
+| `ticket.updated` | `agents`, `user:<creator>`, `ticket:<id>`        | `{ ticket, changedFields: string[], actorId: number }`                  |
+| `comment.added`  | `ticket:<id>`, `agents`, `user:<ticket creator>` | `{ ticketId, comment }` (the comment as `POST .../comments` returns it) |
+
+A socket in several of these rooms gets the event once.
+
 ## Test locators (data-testid)
 
 Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).

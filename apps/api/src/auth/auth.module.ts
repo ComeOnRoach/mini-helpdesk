@@ -30,5 +30,7 @@ import { RolesGuard } from './roles.guard';
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
+  // The WebSocket gateway verifies the same tokens.
+  exports: [JwtModule],
 })
 export class AuthModule {}

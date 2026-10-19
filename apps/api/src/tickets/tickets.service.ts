@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Attachment } from '../attachments/attachment.entity';
@@ -17,6 +18,12 @@ import { ExportTicketsQueryDto } from './dto/export-tickets-query.dto';
 import { TicketDetailResponseDto } from './dto/ticket-detail-response.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 import { canAccessTicket, canDeleteTicket } from './ticket-access';
+import {
+  TICKET_CREATED,
+  TICKET_UPDATED,
+  TicketCreatedEvent,
+  TicketUpdatedEvent,
+} from './events/ticket-events';
 import {
   DEFAULT_LIMIT,
   DEFAULT_PAGE,
@@ -39,6 +46,7 @@ export class TicketsService {
     @InjectRepository(Attachment) private readonly attachments: Repository<Attachment>,
     private readonly users: UsersService,
     private readonly storage: FileStorageService,
+    private readonly events: EventEmitter2,
   ) {}
 
   // Shared by the list and the CSV export, so both always return the same tickets.
@@ -114,8 +122,8 @@ export class TicketsService {
     );
   }
 
-  create(user: User, dto: CreateTicketDto): Promise<TicketResponseDto> {
-    return this.tickets.save(
+  async create(user: User, dto: CreateTicketDto): Promise<TicketResponseDto> {
+    const ticket = await this.tickets.save(
       this.tickets.create({
         title: dto.title,
         description: dto.description,
@@ -126,6 +134,9 @@ export class TicketsService {
         assigneeId: null,
       }),
     );
+    const event: TicketCreatedEvent = { ticket };
+    this.events.emit(TICKET_CREATED, event);
+    return ticket;
   }
 
   async findOne(user: User, id: number): Promise<TicketDetailResponseDto> {
@@ -178,7 +189,17 @@ export class TicketsService {
 
     Object.assign(ticket, dto);
     await this.tickets.save(ticket);
-    return this.tickets.findOneByOrFail({ id });
+    const updated = await this.tickets.findOneByOrFail({ id });
+
+    const event: TicketUpdatedEvent = {
+      ticket: updated,
+      changedFields: Object.keys(dto).filter(
+        (key) => dto[key as keyof UpdateTicketDto] !== undefined,
+      ),
+      actorId: user.id,
+    };
+    this.events.emit(TICKET_UPDATED, event);
+    return updated;
   }
 
   async remove(user: User, id: number): Promise<void> {

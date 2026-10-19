@@ -4,6 +4,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentsModule } from './comments/comments.module';
+import { RealtimeModule } from './realtime/realtime.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
@@ -24,6 +25,7 @@ import { HealthModule } from './health/health.module';
     TicketsModule,
     CommentsModule,
     AttachmentsModule,
+    RealtimeModule,
   ],
 })
 export class AppModule {}
