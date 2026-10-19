@@ -1,4 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
+import { ProtectedRoute } from './auth/protected-route';
 import { Layout } from './components/layout';
 import { ContactsPage } from './pages/contacts-page';
 import { HelpPage } from './pages/help-page';
@@ -15,7 +16,9 @@ export function App() {
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-        <Route path="tickets" element={<TicketsPage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="tickets" element={<TicketsPage />} />
+        </Route>
         <Route path="help" element={<HelpPage />} />
         <Route path="contacts" element={<ContactsPage />} />
         <Route path="*" element={<NotFoundPage />} />

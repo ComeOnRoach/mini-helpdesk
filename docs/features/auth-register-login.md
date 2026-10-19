@@ -21,7 +21,7 @@ The user object is `{ id, email, role, createdAt }`. The password and the hash a
 
 ## Notes
 
-- `GET /auth/me` currently verifies the token inside `AuthService`; T2.2 replaces this with a global guard.
-- A global `ValidationPipe` is enabled here so the DTO rules work; the unified error format arrives in T2.3.
+- `GET /auth/me` is protected by the global guard from T2.2 (`docs/features/jwt-and-role-guards.md`).
+- Validation and the error format: `docs/features/validation-error-format.md`.
 - The `@nestjs/swagger` Nest CLI plugin was removed from `nest-cli.json`: with TypeScript 6 it generated wrong
   metadata (`number` as `BigInt`) and crashed on startup. All DTOs use explicit `@ApiProperty`.

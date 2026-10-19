@@ -1,17 +1,15 @@
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
+import { setupApp } from './common/app-setup';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
 
   app.setGlobalPrefix('api', { exclude: ['health'] });
-  app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
-  );
+  setupApp(app);
   app.enableCors({ origin: config.get<string>('WEB_ORIGIN', 'http://localhost:5173') });
 
   const document = SwaggerModule.createDocument(

@@ -1,8 +1,11 @@
-import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckService, TypeOrmHealthIndicator } from '@nestjs/terminus';
+import { Public } from '../common/decorators/public.decorator';
+import { HealthUnavailableException } from '../common/all-exceptions.filter';
 import { HealthResponseDto } from './health-response.dto';
 
+@Public()
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
@@ -20,7 +23,7 @@ export class HealthController {
     try {
       await this.health.check([() => this.db.pingCheck('db').withTimeout(3000)]);
     } catch {
-      throw new ServiceUnavailableException({ status: 'error', db: 'down' });
+      throw new HealthUnavailableException({ status: 'error', db: 'down' });
     }
     return { status: 'ok', db: 'up' };
   }
