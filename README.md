@@ -188,3 +188,17 @@ Comments:
 | GET    | `/api/tickets/:id/comments` | owner or agent; `?page=&limit=`, oldest first; `{items,total,page,limit}` |
 
 Another user's ticket answers 404. Each new comment emits the internal event `comment.added` (payload in `docs/features/comments.md`) for the WebSocket gateway (T5.1). See `docs/features/comments.md`.
+
+## Test locators (data-testid)
+
+Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).
+
+- **Format:** `kebab-case`, `<page>-<element>`: `login-email`, `login-submit`, `ticket-form-title`, `ticket-details-delete`.
+- **List rows:** `data-testid="ticket-row"` plus `data-ticket-id="<id>"` (comments: `comment-item` plus `data-comment-id`).
+- **No duplicates** on one page, except list rows.
+- **Do not rename** existing testids without a reason; tests will depend on them.
+- **Shared widgets:** toast `toast` (`data-toast-type`), modal `confirm-modal`, `confirm-modal-confirm`, `confirm-modal-cancel`; states `<prefix>-loading`, `<prefix>-empty`, `<prefix>-error`, `<prefix>-retry`; pagination `<prefix>-page-prev`, `<prefix>-page-next`.
+- **Enforced by lint:** `npm run lint` fails if a `button`, `input`, `select`, `textarea`, `form`, `Link` or `NavLink` in `apps/web/src` has no `data-testid`.
+- **Pull requests:** use the checklist in `.github/pull_request_template.md`.
+
+More detail: `docs/features/data-testid.md`.

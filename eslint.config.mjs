@@ -9,4 +9,18 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   prettier,
+  {
+    // T3.6: every interactive element in the web app needs a stable locator.
+    files: ['apps/web/src/**/*.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'JSXOpeningElement[name.name=/^(button|input|select|textarea|form|Link|NavLink)$/]:not(:has(JSXAttribute[name.name="data-testid"]))',
+          message: 'Interactive elements need a data-testid (see README: Test locators).',
+        },
+      ],
+    },
+  },
 );
