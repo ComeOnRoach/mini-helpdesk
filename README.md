@@ -231,6 +231,10 @@ The ticket page has a "Share" button (`ticket-details-share`) that runs `window.
 
 `/contacts` lists three static offices (Lisbon, Kyiv, Berlin). The "Nearest office" button (`contacts-locate`) calls `navigator.geolocation.getCurrentPosition`, computes Haversine distances, highlights the nearest office row (`data-nearest="true"`) and shows `Nearest office: <name>, <km> km` (rounded to 1 decimal, `contacts-result`). Errors have separate messages (`contacts-error`, `data-error-kind` = `denied` / `unavailable` / `timeout` / `unsupported`) and a retry button; `contacts-loading` shows while locating. The position is never stored. Playwright: `context.grantPermissions(['geolocation'])` and `context.setGeolocation(...)`. Test ids: `contacts-title`, `contacts-locate`, `contacts-loading`, `contacts-error`, `contacts-error-message`, `contacts-retry`, `contacts-result`, `contacts-result-office`, `contacts-result-distance`, rows `contacts-office` (`data-office-id`, `data-nearest`). Full description: `docs/features/contacts-geolocation.md`.
 
+## Mobile layout (<= 768px)
+
+At 768px and below the navigation collapses behind a burger button (`nav-burger`, `aria-expanded`, `aria-controls="main-nav"`). The panel holds the links, the notification control, the email and Logout; the connection pill (`nav-connection`) and an unread badge (`nav-burger-badge`) stay in the bar. The menu closes on link click, route change, Escape and logout. The tickets table becomes cards (`data-label` per cell, row testids unchanged), forms and modals use the full width, and buttons and inputs are at least 44px high. The desktop layout (>= 769px) is unchanged. Playwright: `devices['iPhone 13']`, `tap()`. Full description: `docs/features/responsive-mobile.md`.
+
 ## Test locators (data-testid)
 
 Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).

@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/use-auth';
 import { NotificationControl } from './notification-control';
 import { useRealtime } from './use-realtime';
@@ -26,20 +27,58 @@ export function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const { status, unreadTotal } = useRealtime();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { pathname } = useLocation();
   const links = user ? commonLinks : [...commonLinks, ...guestLinks];
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [menuOpen]);
+
   function onLogout() {
+    setMenuOpen(false);
     logout();
     navigate('/login');
   }
 
   return (
     <>
-      <header className="header">
+      <header className="header" data-menu-open={menuOpen}>
         <span className="brand">Mini Helpdesk</span>
-        <nav className="nav" aria-label="Main">
+        <button
+          type="button"
+          className="burger"
+          aria-expanded={menuOpen}
+          aria-controls="main-nav"
+          aria-label="Menu"
+          onClick={() => setMenuOpen((open) => !open)}
+          data-testid="nav-burger"
+        >
+          Menu
+          {unreadTotal > 0 && (
+            <span className="badge burger-badge" data-testid="nav-burger-badge">
+              {unreadTotal > 99 ? '99+' : unreadTotal}
+            </span>
+          )}
+        </button>
+        <nav className="nav" id="main-nav" aria-label="Main">
           {links.map((link) => (
-            <NavLink key={link.to} to={link.to} end data-testid={link.testId}>
+            <NavLink
+              key={link.to}
+              to={link.to}
+              end
+              onClick={() => setMenuOpen(false)}
+              data-testid={link.testId}
+            >
               {link.label}
               {link.testId === 'nav-tickets' && unreadTotal > 0 && (
                 <span className="badge" data-testid="nav-unread-badge">

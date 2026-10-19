@@ -224,16 +224,24 @@ export function TicketsPage() {
             <tbody>
               {data.items.map((ticket) => (
                 <tr key={ticket.id} data-testid="ticket-row" data-ticket-id={ticket.id}>
-                  <td data-testid="ticket-row-id">{ticket.id}</td>
-                  <td>
+                  <td data-label="ID" data-testid="ticket-row-id">
+                    {ticket.id}
+                  </td>
+                  <td data-label="Title">
                     <Link to={`/tickets/${ticket.id}`} data-testid="ticket-row-title">
                       {ticket.title}
                     </Link>
                   </td>
-                  <td data-testid="ticket-row-status">{ticket.status}</td>
-                  <td data-testid="ticket-row-priority">{ticket.priority}</td>
-                  <td data-testid="ticket-row-tags">{ticket.tags.join(', ')}</td>
-                  <td>{new Date(ticket.createdAt).toLocaleDateString()}</td>
+                  <td data-label="Status" data-testid="ticket-row-status">
+                    {ticket.status}
+                  </td>
+                  <td data-label="Priority" data-testid="ticket-row-priority">
+                    {ticket.priority}
+                  </td>
+                  <td data-label="Tags" data-testid="ticket-row-tags">
+                    {ticket.tags.join(', ')}
+                  </td>
+                  <td data-label="Created">{new Date(ticket.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
