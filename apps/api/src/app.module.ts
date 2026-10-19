@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
@@ -17,7 +19,9 @@ import { HealthModule } from './health/health.module';
     DatabaseModule,
     HealthModule,
     AuthModule,
+    EventEmitterModule.forRoot(),
     TicketsModule,
+    CommentsModule,
   ],
 })
 export class AppModule {}

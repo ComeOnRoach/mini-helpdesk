@@ -158,6 +158,13 @@ export class TicketsService {
     await this.tickets.delete({ id });
   }
 
+  // Used by other modules (comments) that must apply the same access rule.
+  async findVisibleOrFail(user: User, id: number): Promise<Ticket> {
+    const ticket = await this.tickets.findOneBy({ id });
+    this.assertVisible(user, ticket);
+    return ticket;
+  }
+
   // A ticket created by someone else answers 404, like a missing one, so its id is not revealed.
   private assertVisible(user: User, ticket: Ticket | null): asserts ticket is Ticket {
     if (!ticket || !canAccessTicket(user, ticket)) {

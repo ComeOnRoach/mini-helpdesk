@@ -16,7 +16,7 @@ const emptyToUndefined = ({ value }: { value: unknown }) =>
   typeof value === 'string' && value.trim() === '' ? undefined : value;
 
 // Query strings arrive as text; empty means "not given" and anything else is parsed as a number.
-const toNumber = ({ value }: { value: unknown }) =>
+export const toNumber = ({ value }: { value: unknown }) =>
   typeof value === 'string' && value.trim() !== '' ? Number(value) : undefined;
 
 export class ListTicketsQueryDto {
