@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAQ</title>
+    <link rel="stylesheet" href="/widgets/widgets.css" />
+  </head>
+  <body>
+    <h1 id="faq-title" data-testid="faq-title">Frequently asked questions</h1>
+
+    <label for="faq-search" class="muted">Search the questions</label>
+    <input
+      type="search"
+      id="faq-search"
+      data-testid="faq-search"
+      placeholder="Type to filter..."
+      autocomplete="off"
+    />
+    <p id="faq-count" data-testid="faq-count" class="muted" aria-live="polite"></p>
+
+    <ul id="faq-list" class="faq-list" data-testid="faq-list">
+      <li class="faq-item" data-testid="faq-item" data-faq-id="1">
+        <button
+          type="button"
+          class="faq-question"
+          id="faq-question-1"
+          data-testid="faq-question"
+          aria-expanded="false"
+          aria-controls="faq-answer-1"
+        >
+          How do I create a ticket?
+        </button>
+        <div class="faq-answer" id="faq-answer-1" data-testid="faq-answer" hidden>
+          Open the Tickets page, press New ticket, fill in the title, description and priority, and
+          submit the form.
+        </div>
+      </li>
+      <li class="faq-item" data-testid="faq-item" data-faq-id="2">
+        <button
+          type="button"
+          class="faq-question"
+          id="faq-question-2"
+          data-testid="faq-question"
+          aria-expanded="false"
+          aria-controls="faq-answer-2"
+        >
+          Who can change the status of a ticket?
+        </button>
+        <div class="faq-answer" id="faq-answer-2" data-testid="faq-answer" hidden>
+          Only agents can change the status and the assignee. Users can edit the text of their own
+          tickets.
+        </div>
+      </li>
+      <li class="faq-item" data-testid="faq-item" data-faq-id="3">
+        <button
+          type="button"
+          class="faq-question"
+          id="faq-question-3"
+          data-testid="faq-question"
+          aria-expanded="false"
+          aria-controls="faq-answer-3"
+        >
+          Can I attach files to a ticket?
+        </button>
+        <div class="faq-answer" id="faq-answer-3" data-testid="faq-answer" hidden>
+          Yes. On the ticket page you can upload attachments and download them later. The size and
+          type of a file are limited.
+        </div>
+      </li>
+      <li class="faq-item" data-testid="faq-item" data-faq-id="4">
+        <button
+          type="button"
+          class="faq-question"
+          id="faq-question-4"
+          data-testid="faq-question"
+          aria-expanded="false"
+          aria-controls="faq-answer-4"
+        >
+          How do I export my tickets?
+        </button>
+        <div class="faq-answer" id="faq-answer-4" data-testid="faq-answer" hidden>
+          Use the Export CSV button on the Tickets page. The file contains the tickets that match
+          the current filters.
+        </div>
+      </li>
+      <li class="faq-item" data-testid="faq-item" data-faq-id="5">
+        <button
+          type="button"
+          class="faq-question"
+          id="faq-question-5"
+          data-testid="faq-question"
+          aria-expanded="false"
+          aria-controls="faq-answer-5"
+        >
+          How do I get notified about new comments?
+        </button>
+        <div class="faq-answer" id="faq-answer-5" data-testid="faq-answer" hidden>
+          Comments appear live, with a toast and an unread badge. Enable browser notifications in
+          the header to get them when this tab is in the background.
+        </div>
+      </li>
+      <li class="faq-item" data-testid="faq-item" data-faq-id="6">
+        <button
+          type="button"
+          class="faq-question"
+          id="faq-question-6"
+          data-testid="faq-question"
+          aria-expanded="false"
+          aria-controls="faq-answer-6"
+        >
+          How do I print a ticket or save it as a PDF?
+        </button>
+        <div class="faq-answer" id="faq-answer-6" data-testid="faq-answer" hidden>
+          Open the ticket and press Print / Save as PDF. The print page has no navigation and is
+          laid out for A4.
+        </div>
+      </li>
+    </ul>
+
+    <p id="faq-empty" class="faq-empty" data-testid="faq-empty" hidden>
+      No questions match your search.
+    </p>
+
+    <section class="feedback-section">
+      <h2 id="faq-feedback-title" data-testid="faq-feedback-title">Feedback</h2>
+      <iframe
+        id="feedback-frame"
+        title="Feedback"
+        src="/widgets/feedback.html"
+        data-testid="faq-feedback-frame"
+      ></iframe>
+    </section>
+
+    <script src="/widgets/faq.js"></script>
+  </body>
+</html>

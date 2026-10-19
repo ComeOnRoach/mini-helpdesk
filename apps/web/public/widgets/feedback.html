@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feedback</title>
+    <link rel="stylesheet" href="/widgets/widgets.css" />
+  </head>
+  <body>
+    <form id="feedback-form" data-testid="feedback-form" novalidate>
+      <fieldset>
+        <legend id="feedback-title" data-testid="feedback-title">Was this helpful?</legend>
+        <span class="choice">
+          <input
+            type="radio"
+            name="helpful"
+            value="yes"
+            id="feedback-helpful-yes"
+            data-testid="feedback-helpful-yes"
+          />
+          <label for="feedback-helpful-yes">Yes</label>
+        </span>
+        <span class="choice">
+          <input
+            type="radio"
+            name="helpful"
+            value="no"
+            id="feedback-helpful-no"
+            data-testid="feedback-helpful-no"
+          />
+          <label for="feedback-helpful-no">No</label>
+        </span>
+      </fieldset>
+
+      <label class="comment" for="feedback-comment">
+        Comment (optional)
+        <textarea
+          id="feedback-comment"
+          data-testid="feedback-comment"
+          name="comment"
+          rows="3"
+          maxlength="500"
+        ></textarea>
+      </label>
+
+      <p id="feedback-error" class="error" data-testid="feedback-error" role="alert" hidden>
+        Please choose Yes or No.
+      </p>
+
+      <button type="submit" id="feedback-submit" data-testid="feedback-submit">Submit</button>
+    </form>
+
+    <p id="feedback-thanks" class="thanks" data-testid="feedback-thanks" role="status" hidden>
+      Thank you for your feedback!
+    </p>
+
+    <script src="/widgets/feedback.js"></script>
+  </body>
+</html>

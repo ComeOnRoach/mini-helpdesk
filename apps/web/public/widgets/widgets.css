@@ -1,0 +1,148 @@
+/* Shared styles of the static widgets (FAQ and feedback). Independent of the app CSS. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  background: #fff;
+  color: #1f2937;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+h1 {
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+}
+
+h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+input[type='search'],
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #9ca3af;
+  border-radius: 6px;
+  font: inherit;
+}
+
+button {
+  padding: 8px 14px;
+  border: 1px solid #1d4ed8;
+  border-radius: 6px;
+  background: #1d4ed8;
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.faq-list {
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.faq-item {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.faq-item[hidden] {
+  display: none;
+}
+
+.faq-question {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 6px;
+  background: #f3f4f6;
+  color: inherit;
+  text-align: left;
+  font-weight: 600;
+}
+
+.faq-question[aria-expanded='true'] {
+  background: #dbeafe;
+}
+
+.faq-answer {
+  margin: 0;
+  padding: 10px 14px;
+}
+
+.faq-empty {
+  padding: 12px;
+  border: 1px dashed #9ca3af;
+  border-radius: 6px;
+  color: #6b7280;
+}
+
+.feedback-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #d1d5db;
+}
+
+#feedback-frame {
+  display: block;
+  width: 100%;
+  height: 250px;
+  border: 1px solid #9ca3af;
+  border-radius: 6px;
+}
+
+fieldset {
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.choice {
+  display: inline-block;
+  margin-right: 16px;
+}
+
+label.comment {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.error {
+  margin: 0 0 12px;
+  color: #b91c1c;
+}
+
+.thanks {
+  padding: 12px;
+  border-radius: 6px;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 600;
+}
+
+[hidden] {
+  display: none !important;
+}
