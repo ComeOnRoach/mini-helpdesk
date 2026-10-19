@@ -3,6 +3,10 @@
 A learning pet project: a ticketing system. It is built **without test automation** and will later be covered with Playwright.
 So the application must be deterministic, with stable locators and built-in testing aids.
 
+## Workflow
+·	Ask one clarifying question only if the task is ambiguous; never assume which file is meant. When the target is clear, state which file you are editing (a statement, not a second question).
+·	Use Plan mode for any task touching more than 2 files.
+
 ## Stack
 
 - **API:** NestJS + TypeScript (strict) + TypeORM + MySQL 8

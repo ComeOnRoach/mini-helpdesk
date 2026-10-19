@@ -8,6 +8,12 @@ uploads/
 .env.*
 !.env.example
 *.log
+*.pem
+*.key
+*.sql
+*.sqlite
+test-results/
+playwright-report/
 .DS_Store
 Thumbs.db
 .idea/
