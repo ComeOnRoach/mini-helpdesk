@@ -7,6 +7,7 @@ import {
   uploadAttachment,
 } from '../api/attachments';
 import type { Attachment } from '../api/attachments';
+import { saveBlob } from '../lib/save-blob';
 import { errorMessage, validateFile } from '../pages/tickets/validation';
 import { ConfirmModal } from './confirm-modal';
 import { EmptyState } from './state-views';
@@ -59,15 +60,8 @@ export function AttachmentsSection({ ticketId, initial }: AttachmentsSectionProp
     setDownloadingId(item.id);
     try {
       const blob = await downloadAttachment(item.id);
-      // The file needs the token, so it is fetched as a blob and saved through a temporary link.
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = item.filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
+      // The file needs the token, so it is fetched as a blob and saved from the browser.
+      saveBlob(blob, item.filename);
     } catch (caught) {
       toast.error(errorMessage(caught));
     } finally {

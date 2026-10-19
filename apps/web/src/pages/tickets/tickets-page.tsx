@@ -1,16 +1,26 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { ChangeEvent } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { PAGE_LIMIT, TICKET_PRIORITIES, TICKET_STATUSES, listTickets } from '../../api/tickets';
+import {
+  PAGE_LIMIT,
+  TICKET_PRIORITIES,
+  TICKET_STATUSES,
+  exportTickets,
+  listTickets,
+} from '../../api/tickets';
 import type { Paginated, Ticket } from '../../api/tickets';
 import { Pagination } from '../../components/pagination';
 import { EmptyState, ErrorState, LoadingState } from '../../components/state-views';
+import { useToast } from '../../components/use-toast';
+import { saveBlob } from '../../lib/save-blob';
 import { errorMessage } from './validation';
 
 const SEARCH_DEBOUNCE_MS = 300;
 
 export function TicketsPage() {
   const [params, setParams] = useSearchParams();
+  const toast = useToast();
+  const [exporting, setExporting] = useState(false);
   const status = params.get('status') ?? '';
   const priority = params.get('priority') ?? '';
   const tag = params.get('tag') ?? '';
@@ -81,15 +91,40 @@ export function TicketsPage() {
   const onSelect = (key: 'status' | 'priority') => (event: ChangeEvent<HTMLSelectElement>) =>
     updateParams({ [key]: event.target.value });
 
+  async function onExport() {
+    setExporting(true);
+    try {
+      // The export has no paging: it takes the current filters but not the page.
+      const { blob, filename } = await exportTickets({ status, priority, tag, q });
+      saveBlob(blob, filename ?? 'tickets.csv');
+      toast.success('CSV exported');
+    } catch (caught) {
+      toast.error(errorMessage(caught));
+    } finally {
+      setExporting(false);
+    }
+  }
+
   const hasFilters = status !== '' || priority !== '' || tag !== '' || q !== '';
 
   return (
     <section>
       <div className="page-header">
         <h1 data-testid="tickets-title">Tickets</h1>
-        <Link to="/tickets/new" className="button" data-testid="tickets-new">
-          New ticket
-        </Link>
+        <div className="form-actions">
+          <button
+            type="button"
+            className="secondary"
+            disabled={exporting}
+            onClick={onExport}
+            data-testid="tickets-export"
+          >
+            {exporting ? 'Exporting...' : 'Export CSV'}
+          </button>
+          <Link to="/tickets/new" className="button" data-testid="tickets-new">
+            New ticket
+          </Link>
+        </div>
       </div>
 
       <div className="filters" data-testid="tickets-filters">

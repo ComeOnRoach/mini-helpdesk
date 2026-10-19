@@ -45,8 +45,25 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   return response.status === 204 ? (undefined as T) : ((await response.json()) as T);
 }
 
+// The file name from a Content-Disposition header (filename* first, then filename), or null.
+export function filenameFromDisposition(header: string | null): string | null {
+  if (!header) return null;
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header);
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded[1]);
+    } catch {
+      // fall back to the plain filename below
+    }
+  }
+  return /filename="([^"]*)"/i.exec(header)?.[1] ?? null;
+}
+
 // For binary answers (file downloads); a plain link cannot send the Authorization header.
-export async function apiFetchBlob(path: string): Promise<Blob> {
+export async function apiFetchBlob(path: string): Promise<{ blob: Blob; filename: string | null }> {
   const response = await request(path, {});
-  return response.blob();
+  return {
+    blob: await response.blob(),
+    filename: filenameFromDisposition(response.headers.get('Content-Disposition')),
+  };
 }
