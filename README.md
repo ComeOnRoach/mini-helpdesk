@@ -168,3 +168,5 @@ The ticket rules are enforced by the ticket endpoints (T3.x) using `canAccessTic
 Details: `docs/features/jwt-and-role-guards.md`.
 
 Web: `/login` and `/register`; `/tickets` needs a login. The token is kept in `localStorage` (`token`). See `docs/features/frontend-auth.md`.
+
+Tickets: `GET /api/tickets?page=1&limit=10&status=open&priority=high&tag=bug&q=text&sort=createdAt:desc` (login required; users see their own tickets, agents all). See `docs/features/tickets-list.md`.
