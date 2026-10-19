@@ -164,9 +164,18 @@ required role gives 403.
 | See and edit tickets                | only their own | all     |
 | Change ticket `status` and assignee | no             | yes     |
 
-The ticket rules are enforced by the ticket endpoints (T3.x) using `canAccessTicket()` and `@Roles()`.
+The ticket rules are enforced by the ticket endpoints (`canAccessTicket()`, `canDeleteTicket()`). A user asking for someone else's ticket gets 404.
 Details: `docs/features/jwt-and-role-guards.md`.
 
 Web: `/login` and `/register`; `/tickets` needs a login. The token is kept in `localStorage` (`token`). See `docs/features/frontend-auth.md`.
 
 Tickets: `GET /api/tickets?page=1&limit=10&status=open&priority=high&tag=bug&q=text&sort=createdAt:desc` (login required; users see their own tickets, agents all). See `docs/features/tickets-list.md`.
+
+| Method | Path               | Who                                                                        |
+| ------ | ------------------ | -------------------------------------------------------------------------- |
+| POST   | `/api/tickets`     | any logged-in user; the ticket starts `open`, created by the caller        |
+| GET    | `/api/tickets/:id` | owner or agent; includes comments and attachments                          |
+| PATCH  | `/api/tickets/:id` | owner or agent; only an agent may send `status` or `assigneeId` (else 403) |
+| DELETE | `/api/tickets/:id` | agent, or the author while the ticket is `open`                            |
+
+See `docs/features/tickets-crud.md`.
