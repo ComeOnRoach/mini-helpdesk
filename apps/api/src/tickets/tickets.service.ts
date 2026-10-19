@@ -1,8 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserRole } from '../common/enums';
+import { TicketPriority, TicketStatus, UserRole } from '../common/enums';
 import { User } from '../users/user.entity';
+import { UsersService } from '../users/users.service';
+import { CreateTicketDto } from './dto/create-ticket.dto';
+import { TicketDetailResponseDto } from './dto/ticket-detail-response.dto';
+import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { canAccessTicket, canDeleteTicket } from './ticket-access';
 import {
   DEFAULT_LIMIT,
   DEFAULT_PAGE,
@@ -10,7 +20,7 @@ import {
   ListTicketsQueryDto,
   SortField,
 } from './dto/list-tickets-query.dto';
-import { TicketListResponseDto } from './dto/ticket-response.dto';
+import { TicketListResponseDto, TicketResponseDto } from './dto/ticket-response.dto';
 import { Ticket } from './ticket.entity';
 
 // Escape LIKE wildcards so "100%" or "a_b" are searched literally.
@@ -20,7 +30,10 @@ function likePattern(text: string): string {
 
 @Injectable()
 export class TicketsService {
-  constructor(@InjectRepository(Ticket) private readonly tickets: Repository<Ticket>) {}
+  constructor(
+    @InjectRepository(Ticket) private readonly tickets: Repository<Ticket>,
+    private readonly users: UsersService,
+  ) {}
 
   async list(user: User, query: ListTicketsQueryDto): Promise<TicketListResponseDto> {
     // Defaults are applied here because an empty query value ("?page=") arrives as undefined.
@@ -66,5 +79,89 @@ export class TicketsService {
       .getManyAndCount();
 
     return { items, total, page, limit };
+  }
+
+  create(user: User, dto: CreateTicketDto): Promise<TicketResponseDto> {
+    return this.tickets.save(
+      this.tickets.create({
+        title: dto.title,
+        description: dto.description,
+        priority: dto.priority ?? TicketPriority.Medium,
+        tags: dto.tags ?? [],
+        status: TicketStatus.Open,
+        createdById: user.id,
+        assigneeId: null,
+      }),
+    );
+  }
+
+  async findOne(user: User, id: number): Promise<TicketDetailResponseDto> {
+    const ticket = await this.tickets.findOne({
+      where: { id },
+      relations: { comments: true, attachments: true },
+      order: {
+        comments: { createdAt: 'ASC', id: 'ASC' },
+        attachments: { createdAt: 'ASC', id: 'ASC' },
+      },
+    });
+    this.assertVisible(user, ticket);
+    return {
+      ...ticket,
+      comments: ticket.comments.map((c) => ({
+        id: c.id,
+        ticketId: c.ticketId,
+        authorId: c.authorId,
+        body: c.body,
+        createdAt: c.createdAt,
+      })),
+      // The server-side file path is internal and not returned.
+      attachments: ticket.attachments.map((a) => ({
+        id: a.id,
+        filename: a.filename,
+        mime: a.mime,
+        size: a.size,
+        createdAt: a.createdAt,
+      })),
+    };
+  }
+
+  async update(user: User, id: number, dto: UpdateTicketDto): Promise<TicketResponseDto> {
+    const ticket = await this.tickets.findOneBy({ id });
+    this.assertVisible(user, ticket);
+
+    const changesAgentFields = dto.status !== undefined || dto.assigneeId !== undefined;
+    if (changesAgentFields && user.role !== UserRole.Agent) {
+      throw new ForbiddenException('Only agents can change status or assignee');
+    }
+    if (Object.values(dto).every((value) => value === undefined)) {
+      throw new BadRequestException('Send at least one field to update');
+    }
+    if (dto.assigneeId !== undefined && dto.assigneeId !== null) {
+      const assignee = await this.users.findById(dto.assigneeId);
+      if (assignee?.role !== UserRole.Agent) {
+        throw new BadRequestException('assigneeId must be the id of an agent');
+      }
+    }
+
+    Object.assign(ticket, dto);
+    await this.tickets.save(ticket);
+    return this.tickets.findOneByOrFail({ id });
+  }
+
+  async remove(user: User, id: number): Promise<void> {
+    const ticket = await this.tickets.findOneBy({ id });
+    this.assertVisible(user, ticket);
+    if (!canDeleteTicket(user, ticket)) {
+      throw new ForbiddenException('Only agents can delete a ticket that is not open');
+    }
+    // Comments and attachment rows go with it (ON DELETE CASCADE).
+    await this.tickets.delete({ id });
+  }
+
+  // A ticket created by someone else answers 404, like a missing one, so its id is not revealed.
+  private assertVisible(user: User, ticket: Ticket | null): asserts ticket is Ticket {
+    if (!ticket || !canAccessTicket(user, ticket)) {
+      throw new NotFoundException('Ticket not found');
+    }
   }
 }
