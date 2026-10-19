@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentsModule } from './comments/comments.module';
 import { TicketsModule } from './tickets/tickets.module';
@@ -22,6 +23,7 @@ import { HealthModule } from './health/health.module';
     EventEmitterModule.forRoot(),
     TicketsModule,
     CommentsModule,
+    AttachmentsModule,
   ],
 })
 export class AppModule {}

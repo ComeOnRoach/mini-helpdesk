@@ -30,6 +30,11 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
     errors.push('JWT_EXPIRES_IN must look like 15m, 1h or 7d');
   }
 
+  const maxUpload = config.MAX_UPLOAD_BYTES;
+  if (maxUpload !== undefined && maxUpload !== '' && !/^[1-9]\d*$/.test(String(maxUpload))) {
+    errors.push('MAX_UPLOAD_BYTES must be a positive integer (bytes)');
+  }
+
   if (errors.length > 0) {
     throw new Error(`Invalid environment configuration:\n - ${errors.join('\n - ')}`);
   }

@@ -1,3 +1,5 @@
+import { ALLOWED_EXTENSIONS, MAX_UPLOAD_BYTES } from '../../api/attachments';
+
 // Mirrors the API limits so forms can show errors before sending a request.
 export function validateTitle(title: string): string | undefined {
   const value = title.trim();
@@ -34,6 +36,15 @@ export function validateCommentBody(body: string): string | undefined {
   const value = body.trim();
   if (value === '') return 'Comment is required';
   if (value.length > 2000) return 'Comment must be at most 2000 characters';
+  return undefined;
+}
+
+export function validateFile(file: File): string | undefined {
+  const extension = file.name.includes('.') ? `.${file.name.split('.').pop()?.toLowerCase()}` : '';
+  if (!ALLOWED_EXTENSIONS.includes(extension)) {
+    return `File type is not allowed. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`;
+  }
+  if (file.size > MAX_UPLOAD_BYTES) return 'File is too large (max 5 MB)';
   return undefined;
 }
 

@@ -15,7 +15,8 @@ export class ApiError extends Error {
 
 export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
-  if (init.body !== undefined && !headers.has('Content-Type')) {
+  // FormData must keep the browser's multipart Content-Type (it carries the boundary).
+  if (init.body !== undefined && !(init.body instanceof FormData) && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
   }
   const token = localStorage.getItem(TOKEN_KEY);
