@@ -13,6 +13,7 @@ import { Pagination } from '../../components/pagination';
 import { EmptyState, ErrorState, LoadingState } from '../../components/state-views';
 import { useRealtimeEvent } from '../../components/use-realtime';
 import { useToast } from '../../components/use-toast';
+import { track } from '../../lib/analytics';
 import { errorMessage, validateCommentBody } from './validation';
 
 export function TicketDetailsPage() {
@@ -45,7 +46,10 @@ export function TicketDetailsPage() {
     setLoadError(null);
     getTicket(id)
       .then((result) => {
-        if (!cancelled) setTicket(result);
+        if (!cancelled) {
+          setTicket(result);
+          track('ticket_open');
+        }
       })
       .catch((caught: unknown) => {
         if (!cancelled) {

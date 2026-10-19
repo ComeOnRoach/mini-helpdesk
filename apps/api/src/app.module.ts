@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { AuthModule } from './auth/auth.module';
 import { CommentsModule } from './comments/comments.module';
@@ -26,6 +27,7 @@ import { HealthModule } from './health/health.module';
     CommentsModule,
     AttachmentsModule,
     RealtimeModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}

@@ -100,6 +100,7 @@ mini-helpdesk/
 | `NODE_ENV`         | `development`           | Runtime environment                                            |
 | `PORT`             | `3000`                  | API listen port                                                |
 | `VITE_API_URL`     | `http://localhost:3000` | API base URL used by the web app                               |
+| `VITE_ANALYTICS_ENABLED` | `true` | `true` sends `POST /api/analytics/events` on key actions; any other value turns it off |
 | `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
@@ -234,6 +235,10 @@ The ticket page has a "Share" button (`ticket-details-share`) that runs `window.
 ## Mobile layout (<= 768px)
 
 At 768px and below the navigation collapses behind a burger button (`nav-burger`, `aria-expanded`, `aria-controls="main-nav"`). The panel holds the links, the notification control, the email and Logout; the connection pill (`nav-connection`) and an unread badge (`nav-burger-badge`) stay in the bar. The menu closes on link click, route change, Escape and logout. The tickets table becomes cards (`data-label` per cell, row testids unchanged), forms and modals use the full width, and buttons and inputs are at least 44px high. The desktop layout (>= 769px) is unchanged. Playwright: `devices['iPhone 13']`, `tap()`. Full description: `docs/features/responsive-mobile.md`.
+
+## Analytics requests (`/api/analytics/events`)
+
+With `VITE_ANALYTICS_ENABLED=true` the web app sends `POST /api/analytics/events` (`{ event, page, ts }`, `ts` = epoch ms; public; API answers 204 and stores nothing) for `login`, `ticket_create`, `ticket_open`, `search` (debounced, non-empty) and `export`. Failures are swallowed and never affect the UI; any other value of the variable sends nothing. Playwright: `page.route('**/analytics/**', route => route.abort())`, `page.waitForRequest`, `request.postDataJSON()`. Full description: `docs/features/analytics-events.md`.
 
 ## Test locators (data-testid)
 

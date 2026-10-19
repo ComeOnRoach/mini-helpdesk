@@ -6,6 +6,7 @@ import { TICKET_PRIORITIES, createTicket, getTicket, updateTicket } from '../../
 import type { Ticket, TicketPriority, TicketUpdate } from '../../api/tickets';
 import { ErrorState, LoadingState } from '../../components/state-views';
 import { useToast } from '../../components/use-toast';
+import { track } from '../../lib/analytics';
 import {
   errorMessage,
   parseTags,
@@ -122,6 +123,7 @@ export function TicketFormPage() {
         navigate(`/tickets/${id}`);
       } else {
         const created = await createTicket(values);
+        track('ticket_create');
         draftSettled.current = true;
         clearDraft();
         setDraftRestored(false);
