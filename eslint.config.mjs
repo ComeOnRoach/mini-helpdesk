@@ -10,6 +10,11 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   prettier,
   {
+    // T6.1: static widgets served as-is (plain browser scripts, not modules).
+    files: ['apps/web/public/**/*.js'],
+    languageOptions: { sourceType: 'script', globals: { document: 'readonly' } },
+  },
+  {
     // T3.6: every interactive element in the web app needs a stable locator.
     files: ['apps/web/src/**/*.tsx'],
     rules: {

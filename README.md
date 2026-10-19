@@ -219,6 +219,10 @@ A socket in several of these rooms gets the event once.
 
 **Browser notifications** (`docs/features/browser-notifications.md`): the header shows the permission (`nav-notifications`, `data-permission` = `default` / `granted` / `denied` / `unsupported`) with an "Enable notifications" button (`nav-notifications-enable`) and a hint when blocked (`nav-notifications-hint`). With permission, a comment from someone else while the tab is hidden shows a system notification; clicking it opens the ticket.
 
+## Help page: iframe in iframe (`/help`)
+
+`/help` embeds `/widgets/faq.html` in `<iframe id="faq-frame" title="FAQ">`, and that page embeds `/widgets/feedback.html` in `<iframe id="feedback-frame" title="Feedback">`. All three levels are the same origin; the widgets are static files in `apps/web/public/widgets/`. Playwright: `page.frameLocator('#faq-frame').frameLocator('#feedback-frame')`. Test ids: page `help-title`, `help-faq-frame`, `help-faq-loading`, `help-faq-open`; FAQ `faq-search`, `faq-count`, `faq-item`, `faq-question`, `faq-answer`, `faq-empty`; feedback `feedback-helpful-yes`, `feedback-helpful-no`, `feedback-comment`, `feedback-submit`, `feedback-error`, `feedback-thanks` (`data-answer`). Full description: `docs/features/nested-iframes.md`.
+
 ## Test locators (data-testid)
 
 Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).

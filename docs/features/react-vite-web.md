@@ -6,15 +6,15 @@ The SPA skeleton in `apps/web`: React 19, Vite 8, TypeScript (strict) and React 
 
 ## Routes
 
-| Path        | Page            | `data-testid` of the title |
-| ----------- | --------------- | -------------------------- |
-| `/`         | Home            | `home-title`               |
-| `/login`    | Login (stub)    | `login-title`              |
-| `/register` | Register (stub) | `register-title`           |
-| `/tickets`  | Tickets (stub)  | `tickets-title`            |
-| `/help`     | Help (stub)     | `help-title`               |
-| `/contacts` | Contacts (stub) | `contacts-title`           |
-| `*`         | Not found       | `not-found-title`          |
+| Path        | Page                        | `data-testid` of the title |
+| ----------- | --------------------------- | -------------------------- |
+| `/`         | Home                        | `home-title`               |
+| `/login`    | Login (stub)                | `login-title`              |
+| `/register` | Register (stub)             | `register-title`           |
+| `/tickets`  | Tickets (stub)              | `tickets-title`            |
+| `/help`     | Help (FAQ in iframes, T6.1) | `help-title`               |
+| `/contacts` | Contacts (stub)             | `contacts-title`           |
+| `*`         | Not found                   | `not-found-title`          |
 
 All routes render inside `Layout` (header, navigation, container). Navigation links carry `nav-home`, `nav-tickets`, `nav-help`, `nav-contacts`, `nav-login`, `nav-register` and are client-side (no page reload).
 
