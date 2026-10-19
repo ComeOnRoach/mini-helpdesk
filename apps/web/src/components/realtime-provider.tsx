@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { TOKEN_KEY } from '../api/client';
 import type { CommentAddedPayload } from '../api/realtime';
 import { useAuth } from '../auth/use-auth';
+import { showCommentNotification } from '../lib/browser-notification';
 import { RealtimeContext } from './realtime-context';
 import type { ConnectionStatus, RealtimeContextValue, RealtimeEvents } from './realtime-context';
 import { useToast } from './use-toast';
@@ -28,6 +29,9 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const toast = useToast();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  // Read through a ref: `navigate` may change on every route change and must not reopen the socket.
+  const navigateRef = useRef(navigate);
   const userId = user?.id ?? null;
 
   const [statusState, setStatusState] = useState<Owned<ConnectionStatus>>({
@@ -40,6 +44,10 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   });
   const listeners = useRef(new Map<keyof RealtimeEvents, Set<Handler>>());
   const viewing = useRef<number | null>(null);
+
+  useEffect(() => {
+    navigateRef.current = navigate;
+  }, [navigate]);
 
   const status = statusState.userId === userId ? statusState.value : 'connecting';
   const unread = unreadState.userId === userId ? unreadState.value : {};
@@ -109,6 +117,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         to: `/tickets/${ticketId}`,
         label: 'Open',
       });
+      showCommentNotification(payload, (id) => navigateRef.current(`/tickets/${id}`));
     });
 
     return () => {
