@@ -223,6 +223,10 @@ A socket in several of these rooms gets the event once.
 
 `/help` embeds `/widgets/faq.html` in `<iframe id="faq-frame" title="FAQ">`, and that page embeds `/widgets/feedback.html` in `<iframe id="feedback-frame" title="Feedback">`. All three levels are the same origin; the widgets are static files in `apps/web/public/widgets/`. Playwright: `page.frameLocator('#faq-frame').frameLocator('#feedback-frame')`. Test ids: page `help-title`, `help-faq-frame`, `help-faq-loading`, `help-faq-open`; FAQ `faq-search`, `faq-count`, `faq-item`, `faq-question`, `faq-answer`, `faq-empty`; feedback `feedback-helpful-yes`, `feedback-helpful-no`, `feedback-comment`, `feedback-submit`, `feedback-error`, `feedback-thanks` (`data-answer`). Full description: `docs/features/nested-iframes.md`.
 
+## Share pop-up (`/share/:id`)
+
+The ticket page has a "Share" button (`ticket-details-share`) that runs `window.open('/share/<id>', 'share', 'width=500,height=600')`. The pop-up page (outside the main layout, login required) shows the ticket title (`share-title`), a read-only input with the ticket link `<origin>/tickets/<id>` (`share-link`), "Copy link" (`share-copy`, writes to the clipboard and shows `share-copied`; on failure `share-copy-error`) and "Close" (`share-close`, `window.close()`). If the browser blocks the pop-up, a toast explains it. Other test ids: `share-page` (`data-ticket-id`), `share-loading`, `share-error`, `share-retry`, `share-not-found`. Playwright: `page.waitForEvent('popup')`. Full description: `docs/features/popup-share.md`.
+
 ## Test locators (data-testid)
 
 Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).
