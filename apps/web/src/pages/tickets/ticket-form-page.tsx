@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ApiError } from '../../api/client';
@@ -13,6 +13,9 @@ import {
   validateTags,
   validateTitle,
 } from './validation';
+import { EMPTY_DRAFT, clearDraft, loadDraft, saveDraft } from './ticket-draft';
+
+const DRAFT_SAVE_MS = 500;
 
 interface FieldErrors {
   title?: string;
@@ -27,11 +30,16 @@ export function TicketFormPage() {
   const navigate = useNavigate();
   const toast = useToast();
 
+  // Only the create form keeps a draft; it is read once, when the form mounts.
+  const [initialDraft] = useState(() => (isEdit ? null : loadDraft()));
+  const [draftRestored, setDraftRestored] = useState(initialDraft !== null);
+  const draftSettled = useRef(false);
+
   const [original, setOriginal] = useState<Ticket | null>(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<TicketPriority>('medium');
-  const [tags, setTags] = useState('');
+  const [title, setTitle] = useState(initialDraft?.title ?? '');
+  const [description, setDescription] = useState(initialDraft?.description ?? '');
+  const [priority, setPriority] = useState<TicketPriority>(initialDraft?.priority ?? 'medium');
+  const [tags, setTags] = useState(initialDraft?.tags ?? '');
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -66,6 +74,24 @@ export function TicketFormPage() {
     };
   }, [id, reloadKey]);
 
+  useEffect(() => {
+    if (isEdit) return;
+    const timer = window.setTimeout(() => {
+      if (!draftSettled.current) saveDraft({ title, description, priority, tags });
+    }, DRAFT_SAVE_MS);
+    return () => window.clearTimeout(timer);
+  }, [isEdit, title, description, priority, tags]);
+
+  function onClearDraft() {
+    clearDraft();
+    setTitle(EMPTY_DRAFT.title);
+    setDescription(EMPTY_DRAFT.description);
+    setPriority(EMPTY_DRAFT.priority);
+    setTags(EMPTY_DRAFT.tags);
+    setErrors({});
+    setDraftRestored(false);
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     const next: FieldErrors = {
@@ -96,6 +122,9 @@ export function TicketFormPage() {
         navigate(`/tickets/${id}`);
       } else {
         const created = await createTicket(values);
+        draftSettled.current = true;
+        clearDraft();
+        setDraftRestored(false);
         toast.success('Ticket created');
         navigate(`/tickets/${created.id}`);
       }
@@ -135,6 +164,11 @@ export function TicketFormPage() {
         {formError && (
           <p className="form-error" role="alert" data-testid="ticket-form-error">
             {formError}
+          </p>
+        )}
+        {!isEdit && draftRestored && (
+          <p className="draft-notice" role="status" data-testid="ticket-form-draft-restored">
+            Draft restored
           </p>
         )}
         <label>
@@ -197,6 +231,16 @@ export function TicketFormPage() {
           <button type="submit" disabled={submitting} data-testid="ticket-form-submit">
             {submitting ? 'Please wait...' : isEdit ? 'Save changes' : 'Create ticket'}
           </button>
+          {!isEdit && (
+            <button
+              type="button"
+              className="secondary"
+              onClick={onClearDraft}
+              data-testid="ticket-form-draft-clear"
+            >
+              Clear draft
+            </button>
+          )}
           <Link
             to={isEdit ? `/tickets/${id}` : '/tickets'}
             className="button secondary"

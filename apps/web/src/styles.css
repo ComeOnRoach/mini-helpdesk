@@ -283,3 +283,11 @@ button.danger {
   padding: 0 6px;
   background: transparent;
 }
+
+.draft-notice {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #e0ecff;
+  color: #1e40af;
+}
