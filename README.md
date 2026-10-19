@@ -179,3 +179,12 @@ Tickets: `GET /api/tickets?page=1&limit=10&status=open&priority=high&tag=bug&q=t
 | DELETE | `/api/tickets/:id` | agent, or the author while the ticket is `open`                            |
 
 See `docs/features/tickets-crud.md`.
+
+Comments:
+
+| Method | Path                        | Who                                                                       |
+| ------ | --------------------------- | ------------------------------------------------------------------------- |
+| POST   | `/api/tickets/:id/comments` | owner or agent; body 1 to 2000 characters; returns the full comment       |
+| GET    | `/api/tickets/:id/comments` | owner or agent; `?page=&limit=`, oldest first; `{items,total,page,limit}` |
+
+Another user's ticket answers 404. Each new comment emits the internal event `comment.added` (payload in `docs/features/comments.md`) for the WebSocket gateway (T5.1). See `docs/features/comments.md`.
