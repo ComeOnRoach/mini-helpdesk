@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, StreamableFile } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { basename } from 'node:path';
 import { Repository } from 'typeorm';
@@ -6,6 +6,7 @@ import { FileStorageService } from '../storage/file-storage.service';
 import { TicketsService } from '../tickets/tickets.service';
 import { User } from '../users/user.entity';
 import { Attachment } from './attachment.entity';
+import { contentDisposition } from './content-disposition';
 import { AttachmentResponseDto } from './dto/attachment-response.dto';
 
 const MAX_NAME_LENGTH = 255;
@@ -51,6 +52,28 @@ export class AttachmentsService {
       await this.storage.remove(file.filename);
       throw error;
     }
+  }
+
+  // Streams the stored file. A missing id and someone else's ticket both answer 404.
+  async download(user: User, attachmentId: number): Promise<StreamableFile> {
+    const attachment = await this.attachments.findOneBy({ id: attachmentId });
+    if (!attachment) {
+      throw new NotFoundException('Attachment not found');
+    }
+    await this.tickets.findVisibleOrFail(user, attachment.ticketId).catch((error: unknown) => {
+      throw error instanceof NotFoundException
+        ? new NotFoundException('Attachment not found')
+        : error;
+    });
+    const file = await this.storage.open(attachment.path);
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+    return new StreamableFile(file.stream, {
+      type: attachment.mime,
+      length: file.size,
+      disposition: contentDisposition(attachment.filename),
+    });
   }
 
   async remove(user: User, ticketId: number, attachmentId: number): Promise<void> {

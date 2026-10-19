@@ -1,6 +1,11 @@
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { ALLOWED_EXTENSIONS, deleteAttachment, uploadAttachment } from '../api/attachments';
+import {
+  ALLOWED_EXTENSIONS,
+  deleteAttachment,
+  downloadAttachment,
+  uploadAttachment,
+} from '../api/attachments';
 import type { Attachment } from '../api/attachments';
 import { errorMessage, validateFile } from '../pages/tickets/validation';
 import { ConfirmModal } from './confirm-modal';
@@ -27,6 +32,7 @@ export function AttachmentsSection({ ticketId, initial }: AttachmentsSectionProp
   const [uploading, setUploading] = useState(false);
   const [toDelete, setToDelete] = useState<Attachment | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
   async function onUpload(event: FormEvent) {
     event.preventDefault();
@@ -46,6 +52,26 @@ export function AttachmentsSection({ ticketId, initial }: AttachmentsSectionProp
       toast.error(message);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function onDownload(item: Attachment) {
+    setDownloadingId(item.id);
+    try {
+      const blob = await downloadAttachment(item.id);
+      // The file needs the token, so it is fetched as a blob and saved through a temporary link.
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = item.filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (caught) {
+      toast.error(errorMessage(caught));
+    } finally {
+      setDownloadingId(null);
     }
   }
 
@@ -78,6 +104,15 @@ export function AttachmentsSection({ ticketId, initial }: AttachmentsSectionProp
                 <span data-testid="attachment-size">{formatSize(item.size)}</span>,{' '}
                 <span data-testid="attachment-mime">{item.mime}</span>
               </span>
+              <button
+                type="button"
+                className="secondary attachment-download"
+                disabled={downloadingId === item.id}
+                onClick={() => onDownload(item)}
+                data-testid="attachment-download"
+              >
+                {downloadingId === item.id ? 'Downloading...' : 'Download'}
+              </button>
               <button
                 type="button"
                 className="danger"
