@@ -217,6 +217,8 @@ A socket in several of these rooms gets the event once.
 
 **In the web app** (`docs/features/realtime-ui.md`): the socket opens after login and closes on logout; a toast "New comment on ticket #N" with a link, an unread badge on the Tickets link (`nav-unread-badge`, reset when the ticket is opened), live comments on the open ticket page, and a connection indicator (`nav-connection`, `data-status` = `connecting` / `online` / `reconnecting` / `offline`).
 
+**Browser notifications** (`docs/features/browser-notifications.md`): the header shows the permission (`nav-notifications`, `data-permission` = `default` / `granted` / `denied` / `unsupported`) with an "Enable notifications" button (`nav-notifications-enable`) and a hint when blocked (`nav-notifications-hint`). With permission, a comment from someone else while the tab is hidden shows a system notification; clicking it opens the ticket.
+
 ## Test locators (data-testid)
 
 Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).

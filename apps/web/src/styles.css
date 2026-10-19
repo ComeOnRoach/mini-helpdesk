@@ -452,3 +452,23 @@ button.danger {
   background: #fee2e2;
   color: #991b1b;
 }
+
+.notifications {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+}
+
+.notifications[data-permission='granted'] {
+  color: #166534;
+}
+
+.notifications[data-permission='denied'] {
+  color: #991b1b;
+}
+
+.notifications-hint {
+  max-width: 260px;
+  color: #6b7280;
+}

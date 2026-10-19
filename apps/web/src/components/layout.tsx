@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/use-auth';
+import { NotificationControl } from './notification-control';
 import { useRealtime } from './use-realtime';
 
 const STATUS_LABELS = {
@@ -50,6 +51,7 @@ export function Layout() {
         </nav>
         {user && (
           <div className="session">
+            <NotificationControl />
             <span className="connection" data-status={status} data-testid="nav-connection">
               {STATUS_LABELS[status]}
             </span>
