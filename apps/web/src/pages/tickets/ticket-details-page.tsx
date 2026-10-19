@@ -165,6 +165,13 @@ export function TicketDetailsPage() {
         <h1 data-testid="ticket-details-title">{ticket.title}</h1>
         <div className="form-actions">
           <Link
+            to={`/tickets/${ticket.id}/print`}
+            className="button secondary"
+            data-testid="ticket-details-print"
+          >
+            Print / Save as PDF
+          </Link>
+          <Link
             to={`/tickets/${ticket.id}/edit`}
             className="button"
             data-testid="ticket-details-edit"

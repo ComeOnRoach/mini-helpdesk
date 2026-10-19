@@ -9,11 +9,16 @@ import { NotFoundPage } from './pages/not-found-page';
 import { RegisterPage } from './pages/register-page';
 import { TicketDetailsPage } from './pages/tickets/ticket-details-page';
 import { TicketFormPage } from './pages/tickets/ticket-form-page';
+import { TicketPrintPage } from './pages/tickets/ticket-print-page';
 import { TicketsPage } from './pages/tickets/tickets-page';
 
 export function App() {
   return (
     <Routes>
+      {/* The print page has no Layout: no header or navigation. */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="tickets/:id/print" element={<TicketPrintPage />} />
+      </Route>
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="login" element={<LoginPage />} />
