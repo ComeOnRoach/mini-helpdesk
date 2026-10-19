@@ -227,6 +227,10 @@ A socket in several of these rooms gets the event once.
 
 The ticket page has a "Share" button (`ticket-details-share`) that runs `window.open('/share/<id>', 'share', 'width=500,height=600')`. The pop-up page (outside the main layout, login required) shows the ticket title (`share-title`), a read-only input with the ticket link `<origin>/tickets/<id>` (`share-link`), "Copy link" (`share-copy`, writes to the clipboard and shows `share-copied`; on failure `share-copy-error`) and "Close" (`share-close`, `window.close()`). If the browser blocks the pop-up, a toast explains it. Other test ids: `share-page` (`data-ticket-id`), `share-loading`, `share-error`, `share-retry`, `share-not-found`. Playwright: `page.waitForEvent('popup')`. Full description: `docs/features/popup-share.md`.
 
+## Contacts page: geolocation (`/contacts`)
+
+`/contacts` lists three static offices (Lisbon, Kyiv, Berlin). The "Nearest office" button (`contacts-locate`) calls `navigator.geolocation.getCurrentPosition`, computes Haversine distances, highlights the nearest office row (`data-nearest="true"`) and shows `Nearest office: <name>, <km> km` (rounded to 1 decimal, `contacts-result`). Errors have separate messages (`contacts-error`, `data-error-kind` = `denied` / `unavailable` / `timeout` / `unsupported`) and a retry button; `contacts-loading` shows while locating. The position is never stored. Playwright: `context.grantPermissions(['geolocation'])` and `context.setGeolocation(...)`. Test ids: `contacts-title`, `contacts-locate`, `contacts-loading`, `contacts-error`, `contacts-error-message`, `contacts-retry`, `contacts-result`, `contacts-result-office`, `contacts-result-distance`, rows `contacts-office` (`data-office-id`, `data-nearest`). Full description: `docs/features/contacts-geolocation.md`.
+
 ## Test locators (data-testid)
 
 Every interactive element in the web app has a `data-testid`, so future Playwright tests do not depend on text or CSS. Playwright reads `data-testid` by default (`getByTestId`).
