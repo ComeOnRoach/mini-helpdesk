@@ -159,6 +159,13 @@ export function TicketDetailsPage() {
   }
   if (!ticket) return null;
 
+  // Same window name: a second click reuses the open pop-up instead of opening another one.
+  function openShare() {
+    const popup = window.open(`/share/${ticket?.id}`, 'share', 'width=500,height=600');
+    if (popup) popup.focus();
+    else toast.error('Pop-up blocked. Allow pop-ups for this site.');
+  }
+
   // The API lets an author delete only open tickets; agents can delete any.
   const canDelete = isAgent || ticket.status === 'open';
 
@@ -172,6 +179,14 @@ export function TicketDetailsPage() {
       <div className="page-header">
         <h1 data-testid="ticket-details-title">{ticket.title}</h1>
         <div className="form-actions">
+          <button
+            type="button"
+            className="button secondary"
+            onClick={openShare}
+            data-testid="ticket-details-share"
+          >
+            Share
+          </button>
           <Link
             to={`/tickets/${ticket.id}/print`}
             className="button secondary"

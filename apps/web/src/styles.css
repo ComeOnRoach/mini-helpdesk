@@ -480,3 +480,18 @@ button.danger {
   border: 1px solid #9ca3af;
   border-radius: 6px;
 }
+
+.share-page {
+  max-width: 460px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.share-page input[readonly] {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.share-copied {
+  color: #166534;
+}
