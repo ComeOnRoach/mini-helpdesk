@@ -87,20 +87,22 @@ mini-helpdesk/
 
 ## Environment variables
 
-| Variable           | Default                 | Purpose                                                 |
-| ------------------ | ----------------------- | ------------------------------------------------------- |
-| `DB_HOST`          | `localhost`             | MySQL host (compose overrides it to `db` for the api)   |
-| `DB_PORT`          | `3306`                  | MySQL port                                              |
-| `DB_USER`          | `helpdesk`              | MySQL application user                                  |
-| `DB_PASSWORD`      | `helpdesk`              | MySQL application password                              |
-| `DB_ROOT_PASSWORD` | `root`                  | MySQL root password (used by the image and healthcheck) |
-| `DB_NAME`          | `helpdesk`              | Database name                                           |
-| `JWT_SECRET`       | `change-me`             | JWT signing secret                                      |
-| `JWT_EXPIRES_IN`   | `1h`                    | Access token lifetime (`15m`, `1h`, `7d`)               |
-| `NODE_ENV`         | `development`           | Runtime environment                                     |
-| `PORT`             | `3000`                  | API listen port                                         |
-| `VITE_API_URL`     | `http://localhost:3000` | API base URL used by the web app                        |
-| `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                              |
+| Variable           | Default                 | Purpose                                                        |
+| ------------------ | ----------------------- | -------------------------------------------------------------- |
+| `DB_HOST`          | `localhost`             | MySQL host (compose overrides it to `db` for the api)          |
+| `DB_PORT`          | `3306`                  | MySQL port                                                     |
+| `DB_USER`          | `helpdesk`              | MySQL application user                                         |
+| `DB_PASSWORD`      | `helpdesk`              | MySQL application password                                     |
+| `DB_ROOT_PASSWORD` | `root`                  | MySQL root password (used by the image and healthcheck)        |
+| `DB_NAME`          | `helpdesk`              | Database name                                                  |
+| `JWT_SECRET`       | `change-me`             | JWT signing secret                                             |
+| `JWT_EXPIRES_IN`   | `1h`                    | Access token lifetime (`15m`, `1h`, `7d`)                      |
+| `NODE_ENV`         | `development`           | Runtime environment                                            |
+| `PORT`             | `3000`                  | API listen port                                                |
+| `VITE_API_URL`     | `http://localhost:3000` | API base URL used by the web app                               |
+| `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
+| `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
+| `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
 
 Never commit `.env`.
 
@@ -168,6 +170,8 @@ The ticket rules are enforced by the ticket endpoints (`canAccessTicket()`, `can
 Details: `docs/features/jwt-and-role-guards.md`.
 
 Web: `/login` and `/register`; `/tickets` needs a login. The token is kept in `localStorage` (`token`). See `docs/features/frontend-auth.md`.
+
+Attachments: `POST /api/tickets/:id/attachments` (multipart field `file`; png, jpg, pdf, txt, csv; up to `MAX_UPLOAD_BYTES`, 5 MB by default) and `DELETE /api/tickets/:id/attachments/:attachmentId`. A user works only with their own tickets (others answer 404), an agent with any. Too large gives 413, a wrong type 415. Files live in `UPLOAD_DIR` (compose volume `uploads_data`). See `docs/features/attachments.md`.
 
 Tickets: `GET /api/tickets?page=1&limit=10&status=open&priority=high&tag=bug&q=text&sort=createdAt:desc` (login required; users see their own tickets, agents all). See `docs/features/tickets-list.md`.
 

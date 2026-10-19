@@ -1,3 +1,4 @@
+import type { Attachment } from './attachments';
 import { apiFetch } from './client';
 
 export type TicketStatus = 'open' | 'in_progress' | 'closed';
@@ -17,6 +18,11 @@ export interface Ticket {
   assigneeId: number | null;
   createdAt: string;
   updatedAt: string;
+}
+
+// GET /api/tickets/:id also embeds the attachments.
+export interface TicketDetails extends Ticket {
+  attachments: Attachment[];
 }
 
 export interface Paginated<T> {
@@ -58,7 +64,7 @@ function toQueryString(query: TicketListQuery): string {
 export const listTickets = (query: TicketListQuery) =>
   apiFetch<Paginated<Ticket>>(`/api/tickets${toQueryString({ limit: PAGE_LIMIT, ...query })}`);
 
-export const getTicket = (id: number | string) => apiFetch<Ticket>(`/api/tickets/${id}`);
+export const getTicket = (id: number | string) => apiFetch<TicketDetails>(`/api/tickets/${id}`);
 
 export const createTicket = (input: TicketInput) =>
   apiFetch<Ticket>('/api/tickets', { method: 'POST', body: JSON.stringify(input) });

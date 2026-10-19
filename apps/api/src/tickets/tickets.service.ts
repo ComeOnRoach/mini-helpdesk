@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Attachment } from '../attachments/attachment.entity';
+import { FileStorageService } from '../storage/file-storage.service';
 import { TicketPriority, TicketStatus, UserRole } from '../common/enums';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -32,7 +34,9 @@ function likePattern(text: string): string {
 export class TicketsService {
   constructor(
     @InjectRepository(Ticket) private readonly tickets: Repository<Ticket>,
+    @InjectRepository(Attachment) private readonly attachments: Repository<Attachment>,
     private readonly users: UsersService,
+    private readonly storage: FileStorageService,
   ) {}
 
   async list(user: User, query: ListTicketsQueryDto): Promise<TicketListResponseDto> {
@@ -154,8 +158,10 @@ export class TicketsService {
     if (!canDeleteTicket(user, ticket)) {
       throw new ForbiddenException('Only agents can delete a ticket that is not open');
     }
-    // Comments and attachment rows go with it (ON DELETE CASCADE).
+    const files = await this.attachments.find({ where: { ticketId: id }, select: { path: true } });
+    // Comments and attachment rows go with it (ON DELETE CASCADE); the files are removed here.
     await this.tickets.delete({ id });
+    await this.storage.removeMany(files.map((file) => file.path));
   }
 
   // Used by other modules (comments) that must apply the same access rule.

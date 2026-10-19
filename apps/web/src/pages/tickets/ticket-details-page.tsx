@@ -5,8 +5,9 @@ import { ApiError } from '../../api/client';
 import { COMMENTS_LIMIT, addComment, listComments } from '../../api/comments';
 import type { TicketComment } from '../../api/comments';
 import { TICKET_STATUSES, deleteTicket, getTicket, updateTicket } from '../../api/tickets';
-import type { Paginated, Ticket, TicketStatus } from '../../api/tickets';
+import type { Paginated, TicketDetails, TicketStatus } from '../../api/tickets';
 import { useAuth } from '../../auth/use-auth';
+import { AttachmentsSection } from '../../components/attachments-section';
 import { ConfirmModal } from '../../components/confirm-modal';
 import { Pagination } from '../../components/pagination';
 import { EmptyState, ErrorState, LoadingState } from '../../components/state-views';
@@ -20,7 +21,7 @@ export function TicketDetailsPage() {
   const toast = useToast();
   const isAgent = user?.role === 'agent';
 
-  const [ticket, setTicket] = useState<Ticket | null>(null);
+  const [ticket, setTicket] = useState<TicketDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<ApiError | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -84,7 +85,8 @@ export function TicketDetailsPage() {
       setStatusBusy(true);
       try {
         const updated = await updateTicket(id, { status });
-        setTicket(updated);
+        // PATCH does not return attachments; keep the ones already loaded.
+        setTicket((current) => (current ? { ...current, ...updated } : current));
         toast.success(`Status changed to ${status}`);
       } catch (caught) {
         toast.error(errorMessage(caught));
@@ -212,6 +214,8 @@ export function TicketDetailsPage() {
       <p className="description" data-testid="ticket-details-description">
         {ticket.description}
       </p>
+
+      <AttachmentsSection ticketId={ticket.id} initial={ticket.attachments} />
 
       <h2>Comments</h2>
       {commentsLoading && <LoadingState prefix="comments" />}
