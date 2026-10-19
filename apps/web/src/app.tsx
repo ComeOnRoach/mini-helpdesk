@@ -7,7 +7,9 @@ import { HomePage } from './pages/home-page';
 import { LoginPage } from './pages/login-page';
 import { NotFoundPage } from './pages/not-found-page';
 import { RegisterPage } from './pages/register-page';
-import { TicketsPage } from './pages/tickets-page';
+import { TicketDetailsPage } from './pages/tickets/ticket-details-page';
+import { TicketFormPage } from './pages/tickets/ticket-form-page';
+import { TicketsPage } from './pages/tickets/tickets-page';
 
 export function App() {
   return (
@@ -18,6 +20,9 @@ export function App() {
         <Route path="register" element={<RegisterPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="tickets" element={<TicketsPage />} />
+          <Route path="tickets/new" element={<TicketFormPage />} />
+          <Route path="tickets/:id" element={<TicketDetailsPage />} />
+          <Route path="tickets/:id/edit" element={<TicketFormPage />} />
         </Route>
         <Route path="help" element={<HelpPage />} />
         <Route path="contacts" element={<ContactsPage />} />
