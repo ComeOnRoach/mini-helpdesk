@@ -15,6 +15,7 @@ const STATUS_LABELS = {
 const commonLinks = [
   { to: '/', label: 'Home', testId: 'nav-home' },
   { to: '/tickets', label: 'Tickets', testId: 'nav-tickets' },
+  { to: '/dashboard', label: 'Dashboard', testId: 'nav-dashboard' },
   { to: '/help', label: 'Help', testId: 'nav-help' },
   { to: '/contacts', label: 'Contacts', testId: 'nav-contacts' },
 ];

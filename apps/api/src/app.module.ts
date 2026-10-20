@@ -10,6 +10,12 @@ import { TicketsModule } from './tickets/tickets.module';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { CspModule } from './csp/csp.module';
+import { TestApiModule } from './test-api/test-api.module';
+import { isTestApiEnabled } from './test-api/test-api.config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { InstabilityInterceptor } from './common/instability.interceptor';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -28,6 +34,11 @@ import { HealthModule } from './health/health.module';
     AttachmentsModule,
     RealtimeModule,
     AnalyticsModule,
+    CspModule,
+    // Test API (T7.3): registered only when enabled, so its routes 404 otherwise.
+    ...(isTestApiEnabled() ? [TestApiModule] : []),
+    StatsModule,
   ],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: InstabilityInterceptor }],
 })
 export class AppModule {}
