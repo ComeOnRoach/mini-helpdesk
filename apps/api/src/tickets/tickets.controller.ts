@@ -12,7 +12,14 @@ import {
   Res,
   StreamableFile,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiHeader,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Response } from 'express';
 import { contentDisposition } from '../common/content-disposition';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
@@ -47,6 +54,17 @@ export class TicketsController {
   @ApiResponse({ status: 200, description: 'A page of tickets', type: TicketListResponseDto })
   @ApiResponse({ status: 400, description: 'Invalid query parameter', type: ErrorResponseDto })
   @ApiResponse(UNAUTHORIZED)
+  @ApiResponse({
+    status: 500,
+    description: 'Simulated failure, only when FLAKY_RATE > 0',
+    type: ErrorResponseDto,
+  })
+  @ApiHeader({
+    name: 'x-delay-ms',
+    required: false,
+    description:
+      'One-off delay in ms (max 10000) replacing SLOW_API_MS; honoured only when NODE_ENV=test or ENABLE_TEST_API=true',
+  })
   list(
     @CurrentUser() user: User,
     @Query() query: ListTicketsQueryDto,

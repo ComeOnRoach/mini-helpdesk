@@ -104,6 +104,8 @@ mini-helpdesk/
 | `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
+| `SLOW_API_MS` | `0` | Delay in ms (0-60000) added to every API response except `/health`, analytics and test routes; `0` = off |
+| `FLAKY_RATE` | `0` | Chance (0-1) that `GET /api/tickets` fails with a random 500; `0` = off |
 
 Never commit `.env`.
 
@@ -257,3 +259,13 @@ More detail: `docs/features/data-testid.md`.
 ## Theme switcher (`nav-theme-toggle`)
 
 The header button switches light/dark (`data-theme` on `<html>`, saved in `localStorage` key `theme`, default from `prefers-color-scheme`, print stays black on white); the Help widgets follow it. Details: `docs/features/theme-switcher.md`.
+
+## Slow / flaky API mode
+
+Two env switches (both `0` = off, the default) let you practise waits, timeouts and retries:
+
+- `SLOW_API_MS=2000` delays every API response by 2 s (not `/health`, `/api/analytics/*`, `/api/test/*`).
+- `FLAKY_RATE=0.3` makes `GET /api/tickets` (the list only) fail with a 500 in the usual error format with probability 0.3. It is random on purpose; use `0` or `1` for exact behaviour.
+- `x-delay-ms: <ms>` header replaces `SLOW_API_MS` for one request (max 10000); honoured only when `NODE_ENV=test` or `ENABLE_TEST_API=true`.
+
+Invalid values stop the API at startup; in production a startup warning is logged. The tickets page shows loading, then an error with a Retry button (`tickets-retry`). Details: `docs/features/slow-api-flaky-mode.md`.

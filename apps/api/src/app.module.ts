@@ -10,6 +10,8 @@ import { TicketsModule } from './tickets/tickets.module';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { InstabilityInterceptor } from './common/instability.interceptor';
 
 @Module({
   imports: [
@@ -29,5 +31,6 @@ import { HealthModule } from './health/health.module';
     RealtimeModule,
     AnalyticsModule,
   ],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: InstabilityInterceptor }],
 })
 export class AppModule {}

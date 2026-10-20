@@ -40,6 +40,8 @@ services:
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:5173}
       UPLOAD_DIR: /app/uploads
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-5242880}
+      SLOW_API_MS: ${SLOW_API_MS:-0}
+      FLAKY_RATE: ${FLAKY_RATE:-0}
     ports:
       - '${PORT:-3000}:${PORT:-3000}'
     volumes:
