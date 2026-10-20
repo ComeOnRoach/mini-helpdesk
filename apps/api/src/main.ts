@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { setupApp } from './common/app-setup';
 import { RealtimeIoAdapter } from './realtime/socket-io.adapter';
 import { applyCsp } from './common/csp';
+import { isTestApiEnabled } from './test-api/test-api.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,16 +23,23 @@ async function bootstrap() {
     exposedHeaders: ['Content-Disposition'],
   });
 
-  const document = SwaggerModule.createDocument(
-    app,
-    new DocumentBuilder()
-      .setTitle('Mini Helpdesk API')
-      .setDescription('Ticketing system API')
-      .setVersion('1.0')
-      .addBearerAuth()
-      .build(),
-  );
-  SwaggerModule.setup('docs', app, document);
+  const swagger = new DocumentBuilder()
+    .setTitle('Mini Helpdesk API')
+    .setDescription(
+      'Ticketing system API. Log in with POST /api/auth/login, then press Authorize and paste the accessToken. ' +
+        'Errors use one format: { statusCode, error, message, path, timestamp }.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth();
+  // The Test API controller is registered only when it is enabled (never in production),
+  // so its routes and its x-test-key scheme appear in the docs only in the same case.
+  if (isTestApiEnabled()) {
+    swagger.addApiKey({ type: 'apiKey', name: 'x-test-key', in: 'header' }, 'test-key');
+  }
+  const document = SwaggerModule.createDocument(app, swagger.build());
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: { persistAuthorization: true },
+  });
 
   await app.listen(config.get<number>('PORT', 3000), '0.0.0.0');
 }

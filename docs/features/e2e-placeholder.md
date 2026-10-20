@@ -4,7 +4,7 @@ Prepares the extension point for the future Playwright suite without adding any 
 
 ## What exists
 
-- `e2e/README.md`: purpose, plans, environment variables, how to run once tests exist, and the table "Feature -> Playwright topic" linking task files and feature docs.
+- `e2e/README.md`: purpose, plans, environment variables, how to run once tests exist, and the table "Feature to Playwright map" (extended in T9.3) linking task files and feature docs.
 - `.github/workflows/ci.yml`: a fully commented-out `e2e` job at the bottom. The active job set is still `api` and `web`, so CI results are unchanged.
 - Variables `BASE_URL`, `API_URL`, `TEST_API_KEY` added to `.env.example` and the README environment table. They are read only by the future Playwright config/tests, not by the API or web app.
 

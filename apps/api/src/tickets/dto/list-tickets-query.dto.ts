@@ -20,14 +20,14 @@ export const toNumber = ({ value }: { value: unknown }) =>
   typeof value === 'string' && value.trim() !== '' ? Number(value) : undefined;
 
 export class ListTicketsQueryDto {
-  @ApiPropertyOptional({ minimum: 1, default: 1 })
+  @ApiPropertyOptional({ minimum: 1, default: 1, example: 1 })
   @Transform(toNumber)
   @IsInt({ message: 'page must be a whole number' })
   @Min(1, { message: 'page must be at least 1' })
   @IsOptional()
   page?: number;
 
-  @ApiPropertyOptional({ minimum: 1, maximum: MAX_LIMIT, default: 10 })
+  @ApiPropertyOptional({ minimum: 1, maximum: MAX_LIMIT, default: 10, example: 10 })
   @Transform(toNumber)
   @IsInt({ message: 'limit must be a whole number' })
   @Min(1, { message: 'limit must be at least 1' })
@@ -51,7 +51,11 @@ export class ListTicketsQueryDto {
   @IsOptional()
   priority?: TicketPriority;
 
-  @ApiPropertyOptional({ description: 'Exact tag, for example "bug"', maxLength: 30 })
+  @ApiPropertyOptional({
+    description: 'Exact tag, for example "bug"',
+    maxLength: 30,
+    example: 'bug',
+  })
   @Transform(emptyToUndefined)
   @IsString()
   @MaxLength(30, { message: 'tag must be at most 30 characters' })
@@ -61,6 +65,7 @@ export class ListTicketsQueryDto {
   @ApiPropertyOptional({
     description: 'Case-insensitive text search in title and description',
     maxLength: 100,
+    example: 'login',
   })
   @Transform(({ value }: { value: unknown }) =>
     emptyToUndefined({ value: typeof value === 'string' ? value.trim() : value }),
