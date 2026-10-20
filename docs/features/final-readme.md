@@ -14,7 +14,7 @@ how it is built and what the test aids are.
 - How to run: Docker dev, Docker production-like, local, and what each CI job does.
 - Troubleshooting and links to every document in `docs/features/`.
 
-Not included on purpose: the Feature to Playwright mapping table (task T9.3).
+The Feature to Playwright map was added later (task T9.3, see feature-playwright-map.md).
 
 ## How it was verified
 
