@@ -10,6 +10,8 @@ import { TicketsModule } from './tickets/tickets.module';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { TestApiModule } from './test-api/test-api.module';
+import { isTestApiEnabled } from './test-api/test-api.config';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { HealthModule } from './health/health.module';
     AttachmentsModule,
     RealtimeModule,
     AnalyticsModule,
+    // Test API (T7.3): registered only when enabled, so its routes 404 otherwise.
+    ...(isTestApiEnabled() ? [TestApiModule] : []),
   ],
 })
 export class AppModule {}

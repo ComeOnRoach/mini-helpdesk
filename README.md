@@ -104,6 +104,8 @@ mini-helpdesk/
 | `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
+| `ENABLE_TEST_API` | `false` | `true` (or `NODE_ENV=test`) registers `/api/test/*`; ignored when `NODE_ENV=production` |
+| `TEST_API_KEY` | _(empty)_ | Secret for the `x-test-key` header; required when the Test API is on |
 
 Never commit `.env`.
 
@@ -257,3 +259,13 @@ More detail: `docs/features/data-testid.md`.
 ## Theme switcher (`nav-theme-toggle`)
 
 The header button switches light/dark (`data-theme` on `<html>`, saved in `localStorage` key `theme`, default from `prefers-color-scheme`, print stays black on white); the Help widgets follow it. Details: `docs/features/theme-switcher.md`.
+
+## Test API (`/api/test`)
+
+For future automated tests. Registered **only** when `ENABLE_TEST_API=true` or `NODE_ENV=test`, and never when `NODE_ENV=production` (routes do not exist, so they answer 404 and are absent from Swagger). Every call needs the header `x-test-key: <TEST_API_KEY>` (missing or wrong gives 401); the API will not start with the Test API on and no `TEST_API_KEY`.
+
+- `POST /api/test/reset` empties comments, attachments, tickets and users (ids restart at 1), deletes uploaded files, then re-runs the deterministic seed. It refuses to run unless `DB_NAME` contains `test`: use a dedicated database.
+- `POST /api/test/seed` `{ "tickets": 5, "status": "open" }` adds deterministic `Test ticket N` tickets (optional `priority`, `createdBy`); needs the base users (otherwise 409: call reset first).
+- `POST /api/test/users` `{ "email", "password", "role" }` creates a user (409 if the email exists).
+
+Details and curl examples: `docs/features/test-api.md`.
