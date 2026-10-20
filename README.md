@@ -84,7 +84,7 @@ mini-helpdesk/
 ├─ eslint.config.mjs          ESLint (flat config), Prettier settings in .prettierrc
 ├─ CLAUDE.md                  project rules
 ├─ e2e/                       (planned) Playwright placeholder
-└─ .github/workflows/         (planned) CI
+└─ .github/workflows/         CI: lint, build, MySQL + health check
 ```
 
 ## Environment variables

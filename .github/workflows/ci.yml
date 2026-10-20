@@ -14,17 +14,114 @@ permissions:
   contents: read
 
 jobs:
-  # Install -> lint -> build, one job per workspace, run in parallel.
-  # Later tasks extend this file: MySQL service + health check (T8.2) in the
-  # api job, a docker build job (T8.3), a commented e2e job (T8.4).
-  build:
-    name: ${{ matrix.workspace }}
+  # API: install -> lint -> build, then run it against a real MySQL service:
+  # migrations -> seed -> start in the background -> wait for /health (db: up).
+  # Later tasks extend this file: a docker build job (T8.3), a commented e2e job (T8.4).
+  api:
+    name: api
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        workspace: [api, web]
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: helpdesk
+          MYSQL_USER: helpdesk
+          MYSQL_PASSWORD: helpdesk
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+        ports:
+          - 3306:3306
+    env:
+      NODE_ENV: test
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: helpdesk
+      DB_PASSWORD: helpdesk
+      DB_NAME: helpdesk
+      JWT_SECRET: ci-only-secret
+      PORT: 3000
+      WEB_ORIGIN: http://127.0.0.1:4173
+      VITE_API_URL: http://127.0.0.1:3000
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build API
+        run: npm run build -w apps/api
+
+      - name: Run migrations
+        run: npm run migration:run -w apps/api
+
+      - name: Seed database
+        run: npm run seed -w apps/api
+
+      - name: Start API in background
+        run: |
+          nohup node apps/api/dist/main > api.log 2>&1 &
+          echo "$!" > api.pid
+
+      - name: Wait for /health (db up)
+        run: |
+          for i in $(seq 1 30); do
+            if body=$(curl -fsS http://127.0.0.1:3000/health); then
+              echo "health: $body"
+              echo "$body" | grep -q '"db":"up"' && exit 0
+              echo "::error::/health answered without db up"
+              exit 1
+            fi
+            if ! kill -0 "$(cat api.pid)" 2>/dev/null; then
+              echo "::error::API process exited before becoming healthy"
+              exit 1
+            fi
+            echo "waiting for API ($i/30)..."
+            sleep 2
+          done
+          echo "::error::API did not become healthy within 60 s"
+          exit 1
+
+      - name: Build web
+        run: npm run build -w apps/web
+
+      - name: Start web preview in background
+        run: |
+          nohup npm run preview -w apps/web -- --host 127.0.0.1 --port 4173 --strictPort > web.log 2>&1 &
+          for i in $(seq 1 15); do
+            curl -fsS -o /dev/null http://127.0.0.1:4173/ && exit 0
+            sleep 2
+          done
+          echo "::error::web preview did not start within 30 s"
+          exit 1
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-logs
+          path: |
+            api.log
+            web.log
+          if-no-files-found: ignore
+
+  # Install -> lint -> build for the web workspace.
+  web:
+    name: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -40,4 +137,4 @@ jobs:
         run: npm run lint
 
       - name: Build
-        run: npm run build -w apps/${{ matrix.workspace }}
+        run: npm run build -w apps/web
