@@ -1,5 +1,7 @@
 # Mini Helpdesk
 
+[![CI](https://github.com/ComeOnRoach/mini-helpdesk/actions/workflows/ci.yml/badge.svg)](https://github.com/ComeOnRoach/mini-helpdesk/actions/workflows/ci.yml)
+
 A learning pet project: a ticketing system (NestJS + React + MySQL), built in an npm-workspaces monorepo.
 
 ## Requirements
@@ -78,11 +80,12 @@ mini-helpdesk/
 │  └─ features/               one document per finished feature
 ├─ docker-compose.yml         db + api + web
 ├─ docker-compose.override.yml  dev file watching (polling) for Windows bind mounts
+├─ docker-compose.prod.yml    production-like stack built from the Dockerfiles
 ├─ .env.example               all environment variables with defaults
 ├─ eslint.config.mjs          ESLint (flat config), Prettier settings in .prettierrc
 ├─ CLAUDE.md                  project rules
-├─ e2e/                       (planned) Playwright placeholder
-└─ .github/workflows/         (planned) CI
+├─ e2e/                       Playwright placeholder (README only, no tests)
+└─ .github/workflows/         CI: lint, build, MySQL + health check, commented e2e job
 ```
 
 ## Environment variables
@@ -102,14 +105,22 @@ mini-helpdesk/
 | `VITE_API_URL`     | `http://localhost:3000` | API base URL used by the web app                               |
 | `VITE_ANALYTICS_ENABLED` | `true` | `true` sends `POST /api/analytics/events` on key actions; any other value turns it off |
 | `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
+| `BASE_URL`         | `http://localhost:5173` | Playwright only (`e2e/`, future): web app URL                  |
+| `API_URL`          | `http://localhost:3000` | Playwright only: API base URL                                  |
+| `TEST_API_KEY`     | empty                   | Playwright only: `x-test-key` value, must equal the API's key (Test API, T7.3) |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
+
+| `WEB_PORT`         | `5173`                  | Host port of the web container in `docker-compose.prod.yml`    |
+| `CSP_ENABLED`      | `false`                 | `true` sends the Content-Security-Policy header (T7.2; nginx in the prod web image) |
+| `CSP_REPORT_ONLY`  | `false`                 | `true` sends it as `Content-Security-Policy-Report-Only`       |
 | `CSP_ENABLED` | `false` | `true` sends a `Content-Security-Policy` header from the API (helmet) and from the web dev/preview server |
 | `CSP_REPORT_ONLY` | `false` | With `CSP_ENABLED=true`, `true` sends `Content-Security-Policy-Report-Only` instead (violations are reported, not blocked) |
 | `ENABLE_TEST_API` | `false` | `true` (or `NODE_ENV=test`) registers `/api/test/*`; ignored when `NODE_ENV=production` |
 | `TEST_API_KEY` | _(empty)_ | Secret for the `x-test-key` header; required when the Test API is on |
 | `SLOW_API_MS` | `0` | Delay in ms (0-60000) added to every API response except `/health`, analytics and test routes; `0` = off |
 | `FLAKY_RATE` | `0` | Chance (0-1) that `GET /api/tickets` fails with a random 500; `0` = off |
+
 
 Never commit `.env`.
 
@@ -264,6 +275,21 @@ More detail: `docs/features/data-testid.md`.
 
 The header button switches light/dark (`data-theme` on `<html>`, saved in `localStorage` key `theme`, default from `prefers-color-scheme`, print stays black on white); the Help widgets follow it. Details: `docs/features/theme-switcher.md`.
 
+## Production images (`docker-compose.prod.yml`)
+
+`docker compose up` stays the hot-reload dev stack. To run the stack from the production images
+(`apps/api/Dockerfile`: Node 20 alpine, non-root, about 230 MB; `apps/web/Dockerfile`: Vite build
+served by unprivileged nginx on port 8080):
+
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
+`VITE_API_URL` is baked into the web bundle at build time and must be the address the browser uses
+for the API. The web container sets the CSP header from `CSP_ENABLED` / `CSP_REPORT_ONLY`.
+Build context is the repository root; each image has its own `<Dockerfile>.dockerignore`.
+The CI job `docker` builds both images and checks that the api image is under 300 MB and that neither image runs as root.
+See `docs/features/dockerfiles.md`.
 ## Service files: robots.txt and sitemap.xml
 
 Static files in `apps/web/public/`, served by the web origin at the site root: `/robots.txt` (`text/plain`; `Disallow: /admin`, `Disallow: /tickets`, `Sitemap: http://localhost:5173/sitemap.xml`) and `/sitemap.xml` (XML; `/`, `/login`, `/register`, `/help`, `/contacts`; no private pages). The host is hardcoded as `http://localhost:5173`; edit both files for another host. Playwright: `request.get`, `page.goto`, `context.route('**/robots.txt', ...)`. Details: `docs/features/robots-sitemap.md`.
