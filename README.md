@@ -104,6 +104,8 @@ mini-helpdesk/
 | `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
+| `CSP_ENABLED` | `false` | `true` sends a `Content-Security-Policy` header from the API (helmet) and from the web dev/preview server |
+| `CSP_REPORT_ONLY` | `false` | With `CSP_ENABLED=true`, `true` sends `Content-Security-Policy-Report-Only` instead (violations are reported, not blocked) |
 
 Never commit `.env`.
 
@@ -258,7 +260,10 @@ More detail: `docs/features/data-testid.md`.
 
 The header button switches light/dark (`data-theme` on `<html>`, saved in `localStorage` key `theme`, default from `prefers-color-scheme`, print stays black on white); the Help widgets follow it. Details: `docs/features/theme-switcher.md`.
 
-
 ## Service files: robots.txt and sitemap.xml
 
 Static files in `apps/web/public/`, served by the web origin at the site root: `/robots.txt` (`text/plain`; `Disallow: /admin`, `Disallow: /tickets`, `Sitemap: http://localhost:5173/sitemap.xml`) and `/sitemap.xml` (XML; `/`, `/login`, `/register`, `/help`, `/contacts`; no private pages). The host is hardcoded as `http://localhost:5173`; edit both files for another host. Playwright: `request.get`, `page.goto`, `context.route('**/robots.txt', ...)`. Details: `docs/features/robots-sitemap.md`.
+
+## Content-Security-Policy (`CSP_ENABLED`, `CSP_REPORT_ONLY`)
+
+Off by default. `CSP_ENABLED=true` adds a `Content-Security-Policy` header to API responses (helmet, CSP only) and to the web dev/preview server (Vite plugin); `CSP_REPORT_ONLY=true` switches both to `Content-Security-Policy-Report-Only`. Violations are POSTed to `POST /api/csp-report` (logged, `204`). Swagger `/docs` gets a relaxed policy. Details and limitations: `docs/features/csp.md`.
