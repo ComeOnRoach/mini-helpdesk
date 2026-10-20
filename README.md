@@ -37,13 +37,13 @@ docker compose down -v     # stop and wipe the database and node_modules volumes
 
 ## Addresses
 
-| What    | URL                          | Expected                                |
-| ------- | ---------------------------- | --------------------------------------- |
-| Web     | http://localhost:5173        | The app with the navigation bar         |
-| API     | http://localhost:3000        | Base URL for the web client             |
-| Swagger | http://localhost:3000/docs   | Interactive API documentation           |
-| Health  | http://localhost:3000/health | `{"status":"ok","db":"up"}`             |
-| MySQL   | `localhost:3306`             | User, password and database from `.env` |
+| What    | URL                          | Expected                                                                                                                 |
+| ------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Web     | http://localhost:5173        | The app with the navigation bar                                                                                          |
+| API     | http://localhost:3000        | Base URL for the web client                                                                                              |
+| Swagger | http://localhost:3000/docs   | Interactive API docs (Authorize keeps the token after reload; `/api/test/*` is listed only when the Test API is enabled) |
+| Health  | http://localhost:3000/health | `{"status":"ok","db":"up"}`                                                                                              |
+| MySQL   | `localhost:3306`             | User, password and database from `.env`                                                                                  |
 
 ## Local development without Docker
 
@@ -90,37 +90,36 @@ mini-helpdesk/
 
 ## Environment variables
 
-| Variable           | Default                 | Purpose                                                        |
-| ------------------ | ----------------------- | -------------------------------------------------------------- |
-| `DB_HOST`          | `localhost`             | MySQL host (compose overrides it to `db` for the api)          |
-| `DB_PORT`          | `3306`                  | MySQL port                                                     |
-| `DB_USER`          | `helpdesk`              | MySQL application user                                         |
-| `DB_PASSWORD`      | `helpdesk`              | MySQL application password                                     |
-| `DB_ROOT_PASSWORD` | `root`                  | MySQL root password (used by the image and healthcheck)        |
-| `DB_NAME`          | `helpdesk`              | Database name                                                  |
-| `JWT_SECRET`       | `change-me`             | JWT signing secret                                             |
-| `JWT_EXPIRES_IN`   | `1h`                    | Access token lifetime (`15m`, `1h`, `7d`)                      |
-| `NODE_ENV`         | `development`           | Runtime environment                                            |
-| `PORT`             | `3000`                  | API listen port                                                |
-| `VITE_API_URL`     | `http://localhost:3000` | API base URL used by the web app                               |
-| `VITE_ANALYTICS_ENABLED` | `true` | `true` sends `POST /api/analytics/events` on key actions; any other value turns it off |
-| `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
-| `BASE_URL`         | `http://localhost:5173` | Playwright only (`e2e/`, future): web app URL                  |
-| `API_URL`          | `http://localhost:3000` | Playwright only: API base URL                                  |
-| `TEST_API_KEY`     | empty                   | Playwright only: `x-test-key` value, must equal the API's key (Test API, T7.3) |
-| `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
-| `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
+| Variable                 | Default                 | Purpose                                                                                |
+| ------------------------ | ----------------------- | -------------------------------------------------------------------------------------- |
+| `DB_HOST`                | `localhost`             | MySQL host (compose overrides it to `db` for the api)                                  |
+| `DB_PORT`                | `3306`                  | MySQL port                                                                             |
+| `DB_USER`                | `helpdesk`              | MySQL application user                                                                 |
+| `DB_PASSWORD`            | `helpdesk`              | MySQL application password                                                             |
+| `DB_ROOT_PASSWORD`       | `root`                  | MySQL root password (used by the image and healthcheck)                                |
+| `DB_NAME`                | `helpdesk`              | Database name                                                                          |
+| `JWT_SECRET`             | `change-me`             | JWT signing secret                                                                     |
+| `JWT_EXPIRES_IN`         | `1h`                    | Access token lifetime (`15m`, `1h`, `7d`)                                              |
+| `NODE_ENV`               | `development`           | Runtime environment                                                                    |
+| `PORT`                   | `3000`                  | API listen port                                                                        |
+| `VITE_API_URL`           | `http://localhost:3000` | API base URL used by the web app                                                       |
+| `VITE_ANALYTICS_ENABLED` | `true`                  | `true` sends `POST /api/analytics/events` on key actions; any other value turns it off |
+| `WEB_ORIGIN`             | `http://localhost:5173` | Origin allowed by API CORS                                                             |
+| `BASE_URL`               | `http://localhost:5173` | Playwright only (`e2e/`, future): web app URL                                          |
+| `API_URL`                | `http://localhost:3000` | Playwright only: API base URL                                                          |
+| `TEST_API_KEY`           | empty                   | Playwright only: `x-test-key` value, must equal the API's key (Test API, T7.3)         |
+| `UPLOAD_DIR`             | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume)                         |
+| `MAX_UPLOAD_BYTES`       | `5242880`               | Attachment size limit in bytes (5 MB)                                                  |
 
-| `WEB_PORT`         | `5173`                  | Host port of the web container in `docker-compose.prod.yml`    |
-| `CSP_ENABLED`      | `false`                 | `true` sends the Content-Security-Policy header (T7.2; nginx in the prod web image) |
-| `CSP_REPORT_ONLY`  | `false`                 | `true` sends it as `Content-Security-Policy-Report-Only`       |
+| `WEB_PORT` | `5173` | Host port of the web container in `docker-compose.prod.yml` |
+| `CSP_ENABLED` | `false` | `true` sends the Content-Security-Policy header (T7.2; nginx in the prod web image) |
+| `CSP_REPORT_ONLY` | `false` | `true` sends it as `Content-Security-Policy-Report-Only` |
 | `CSP_ENABLED` | `false` | `true` sends a `Content-Security-Policy` header from the API (helmet) and from the web dev/preview server |
 | `CSP_REPORT_ONLY` | `false` | With `CSP_ENABLED=true`, `true` sends `Content-Security-Policy-Report-Only` instead (violations are reported, not blocked) |
 | `ENABLE_TEST_API` | `false` | `true` (or `NODE_ENV=test`) registers `/api/test/*`; ignored when `NODE_ENV=production` |
 | `TEST_API_KEY` | _(empty)_ | Secret for the `x-test-key` header; required when the Test API is on |
 | `SLOW_API_MS` | `0` | Delay in ms (0-60000) added to every API response except `/health`, analytics and test routes; `0` = off |
 | `FLAKY_RATE` | `0` | Chance (0-1) that `GET /api/tickets` fails with a random 500; `0` = off |
-
 
 Never commit `.env`.
 
@@ -290,6 +289,7 @@ for the API. The web container sets the CSP header from `CSP_ENABLED` / `CSP_REP
 Build context is the repository root; each image has its own `<Dockerfile>.dockerignore`.
 The CI job `docker` builds both images and checks that the api image is under 300 MB and that neither image runs as root.
 See `docs/features/dockerfiles.md`.
+
 ## Service files: robots.txt and sitemap.xml
 
 Static files in `apps/web/public/`, served by the web origin at the site root: `/robots.txt` (`text/plain`; `Disallow: /admin`, `Disallow: /tickets`, `Sitemap: http://localhost:5173/sitemap.xml`) and `/sitemap.xml` (XML; `/`, `/login`, `/register`, `/help`, `/contacts`; no private pages). The host is hardcoded as `http://localhost:5173`; edit both files for another host. Playwright: `request.get`, `page.goto`, `context.route('**/robots.txt', ...)`. Details: `docs/features/robots-sitemap.md`.

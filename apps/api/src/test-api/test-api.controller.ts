@@ -6,6 +6,7 @@ import {
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
+  ApiSecurity,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
@@ -23,6 +24,7 @@ import { TestApiService } from './test-api.service';
 
 // Registered only when the Test API is enabled; guarded by x-test-key instead of a JWT.
 @ApiTags('test')
+@ApiSecurity('test-key')
 @ApiHeader({ name: 'x-test-key', required: true, description: 'Value of TEST_API_KEY' })
 @ApiUnauthorizedResponse({ type: ErrorResponseDto, description: 'Missing or wrong x-test-key' })
 @Public()
