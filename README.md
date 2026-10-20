@@ -1,5 +1,7 @@
 # Mini Helpdesk
 
+[![CI](https://github.com/ComeOnRoach/mini-helpdesk/actions/workflows/ci.yml/badge.svg)](https://github.com/ComeOnRoach/mini-helpdesk/actions/workflows/ci.yml)
+
 A learning pet project: a ticketing system (NestJS + React + MySQL), built in an npm-workspaces monorepo.
 
 ## Requirements
