@@ -83,8 +83,8 @@ mini-helpdesk/
 ├─ .env.example               all environment variables with defaults
 ├─ eslint.config.mjs          ESLint (flat config), Prettier settings in .prettierrc
 ├─ CLAUDE.md                  project rules
-├─ e2e/                       (planned) Playwright placeholder
-└─ .github/workflows/         CI: lint, build, MySQL + health check
+├─ e2e/                       Playwright placeholder (README only, no tests)
+└─ .github/workflows/         CI: lint, build, MySQL + health check, commented e2e job
 ```
 
 ## Environment variables
@@ -104,6 +104,9 @@ mini-helpdesk/
 | `VITE_API_URL`     | `http://localhost:3000` | API base URL used by the web app                               |
 | `VITE_ANALYTICS_ENABLED` | `true` | `true` sends `POST /api/analytics/events` on key actions; any other value turns it off |
 | `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
+| `BASE_URL`         | `http://localhost:5173` | Playwright only (`e2e/`, future): web app URL                  |
+| `API_URL`          | `http://localhost:3000` | Playwright only: API base URL                                  |
+| `TEST_API_KEY`     | empty                   | Playwright only: `x-test-key` value, must equal the API's key (Test API, T7.3) |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
 
