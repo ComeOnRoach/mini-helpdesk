@@ -15,6 +15,7 @@ import { TestApiModule } from './test-api/test-api.module';
 import { isTestApiEnabled } from './test-api/test-api.config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { InstabilityInterceptor } from './common/instability.interceptor';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { InstabilityInterceptor } from './common/instability.interceptor';
     CspModule,
     // Test API (T7.3): registered only when enabled, so its routes 404 otherwise.
     ...(isTestApiEnabled() ? [TestApiModule] : []),
+    StatsModule,
   ],
   providers: [{ provide: APP_INTERCEPTOR, useClass: InstabilityInterceptor }],
 })

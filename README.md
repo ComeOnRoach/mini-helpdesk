@@ -291,3 +291,7 @@ Two env switches (both `0` = off, the default) let you practise waits, timeouts 
 - `x-delay-ms: <ms>` header replaces `SLOW_API_MS` for one request (max 10000); honoured only when `NODE_ENV=test` or `ENABLE_TEST_API=true`.
 
 Invalid values stop the API at startup; in production a startup warning is logged. The tickets page shows loading, then an error with a Retry button (`tickets-retry`). Details: `docs/features/slow-api-flaky-mode.md`.
+
+## Dashboard and stats
+
+`GET /api/stats` returns `{ total, open, in_progress, closed, byPriority: { low, medium, high } }` (agent: all tickets, user: only their own; JWT required). The `/dashboard` page (`nav-dashboard`) shows the counters as cards with CSS bars (`stat-open`, `stat-in-progress`, `stat-closed`, `stat-total`, `stat-priority-*`, each with `data-value`) plus loading/empty/error states and a Refresh button. Details: `docs/features/stats-dashboard.md`.
