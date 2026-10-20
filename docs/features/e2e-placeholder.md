@@ -15,7 +15,7 @@ Same setup as the `api` job (MySQL service, migrations, seed, API in the backgro
 ## To enable it
 
 1. Add `@playwright/test`, a `playwright.config.ts` (using `BASE_URL`) and the tests. No application change is needed.
-2. Make sure the Test API (T7.3, branch `feat/T7.3-test-endpoints-reset-seed`) is merged; before that, `ENABLE_TEST_API` and `TEST_API_KEY` are ignored by the API.
+2. The Test API (T7.3) is already in the API; it needs `ENABLE_TEST_API=true` (or `NODE_ENV=test`) and a non-empty `TEST_API_KEY`, otherwise the API does not start.
 3. Remove the leading `# ` from every line of the block.
 
 ## Verification

@@ -20,7 +20,7 @@ Rules: no tests, and no `package.json` or Playwright config changes are part of 
 | `API_URL`      | `http://localhost:3000` | API base URL, for the `request` fixture and the Test API    |
 | `TEST_API_KEY` | none                    | Value of the `x-test-key` header; must equal the API's key  |
 
-The API must run with `ENABLE_TEST_API=true` (or `NODE_ENV=test`) and the same `TEST_API_KEY`. The Test API is task T7.3 (branch `feat/T7.3-test-endpoints-reset-seed`); until it is merged, these two API variables have no effect.
+The API must run with `ENABLE_TEST_API=true` (or `NODE_ENV=test`) and the same `TEST_API_KEY`. The Test API is task T7.3; the API refuses to start when it is enabled without `TEST_API_KEY`.
 
 ## Running once tests exist
 

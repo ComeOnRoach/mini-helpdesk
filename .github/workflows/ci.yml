@@ -204,9 +204,9 @@ jobs:
   # the tests exist. See e2e/README.md. Prerequisites, outside this file:
   #   - @playwright/test is a dependency and there is a playwright.config.ts
   #     (the repo has neither yet; `playwright test` fails with "No tests found")
-  #   - the Test API (T7.3, /api/test/*, branch feat/T7.3-test-endpoints-reset-seed)
-  #     is merged; until then ENABLE_TEST_API / TEST_API_KEY are ignored by the API
-  #     and tests relying on /api/test/reset cannot work.
+  #   - the Test API (T7.3, /api/test/*) is already in the API; it needs
+  #     ENABLE_TEST_API=true (or NODE_ENV=test) and a non-empty TEST_API_KEY, and
+  #     the API refuses to start without the key.
   # Same setup as the `api` job (MySQL, migrations, seed, API + web preview).
   # ---------------------------------------------------------------------------
   # e2e:
