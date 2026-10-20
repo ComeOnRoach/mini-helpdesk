@@ -16,7 +16,7 @@ permissions:
 jobs:
   # API: install -> lint -> build, then run it against a real MySQL service:
   # migrations -> seed -> start in the background -> wait for /health (db: up).
-  # Later tasks extend this file: a docker build job (T8.3). A commented e2e job (T8.4) sits at the bottom.
+  # Further jobs: `docker` (T8.3) builds the production images; a commented e2e job (T8.4) sits at the bottom.
   api:
     name: api
     runs-on: ubuntu-latest
@@ -138,6 +138,63 @@ jobs:
 
       - name: Build
         run: npm run build -w apps/web
+
+  # Production images (T8.3): build both from the repository root with BuildKit
+  # (each Dockerfile picks up its own <Dockerfile>.dockerignore), then check that
+  # the api image is small (< 300 MB) and neither container runs as root.
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DOCKER_BUILDKIT: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build api image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/api/Dockerfile
+          load: true
+          push: false
+          tags: helpdesk-api:ci
+          cache-from: type=gha,scope=api
+          cache-to: type=gha,scope=api,mode=max
+
+      - name: Build web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web/Dockerfile
+          load: true
+          push: false
+          tags: helpdesk-web:ci
+          build-args: |
+            VITE_API_URL=http://localhost:3000
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,scope=web,mode=max
+
+      - name: Check image size and non-root user
+        run: |
+          docker image ls helpdesk-api:ci helpdesk-web:ci
+          size=$(docker image inspect helpdesk-api:ci --format '{{.Size}}')
+          echo "api image: $((size / 1024 / 1024)) MB"
+          if [ "$size" -ge $((300 * 1024 * 1024)) ]; then
+            echo "::error::api image is $((size / 1024 / 1024)) MB, limit is 300 MB"
+            exit 1
+          fi
+          for img in helpdesk-api:ci helpdesk-web:ci; do
+            uid=$(docker run --rm --entrypoint id "$img" -u)
+            echo "$img runs as uid $uid"
+            if [ "$uid" = "0" ]; then
+              echo "::error::$img runs as root"
+              exit 1
+            fi
+          done
 
   # ---------------------------------------------------------------------------
   # e2e (T8.4) - DISABLED PLACEHOLDER for the future Playwright suite.

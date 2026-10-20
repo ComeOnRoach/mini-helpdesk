@@ -1,0 +1,17 @@
+# Used automatically by BuildKit for apps/web/Dockerfile (context = repo root).
+**/node_modules
+**/dist
+**/*.tsbuildinfo
+.git
+.github
+.claude
+.env
+.env.*
+!.env.example
+**/uploads
+e2e
+docs
+*.md
+docker-compose*.yml
+apps/api
+!apps/api/package.json
