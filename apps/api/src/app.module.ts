@@ -11,6 +11,8 @@ import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { CspModule } from './csp/csp.module';
+import { TestApiModule } from './test-api/test-api.module';
+import { isTestApiEnabled } from './test-api/test-api.config';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { CspModule } from './csp/csp.module';
     RealtimeModule,
     AnalyticsModule,
     CspModule,
+    // Test API (T7.3): registered only when enabled, so its routes 404 otherwise.
+    ...(isTestApiEnabled() ? [TestApiModule] : []),
   ],
 })
 export class AppModule {}

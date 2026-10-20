@@ -35,6 +35,13 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
     errors.push('MAX_UPLOAD_BYTES must be a positive integer (bytes)');
   }
 
+  const testApiOn =
+    config.NODE_ENV !== 'production' &&
+    (config.NODE_ENV === 'test' || config.ENABLE_TEST_API === 'true');
+  if (testApiOn && String(config.TEST_API_KEY ?? '').trim() === '') {
+    errors.push('TEST_API_KEY is required when the Test API is enabled');
+  }
+
   if (errors.length > 0) {
     throw new Error(`Invalid environment configuration:\n - ${errors.join('\n - ')}`);
   }

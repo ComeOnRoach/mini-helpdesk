@@ -106,6 +106,8 @@ mini-helpdesk/
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
 | `CSP_ENABLED` | `false` | `true` sends a `Content-Security-Policy` header from the API (helmet) and from the web dev/preview server |
 | `CSP_REPORT_ONLY` | `false` | With `CSP_ENABLED=true`, `true` sends `Content-Security-Policy-Report-Only` instead (violations are reported, not blocked) |
+| `ENABLE_TEST_API` | `false` | `true` (or `NODE_ENV=test`) registers `/api/test/*`; ignored when `NODE_ENV=production` |
+| `TEST_API_KEY` | _(empty)_ | Secret for the `x-test-key` header; required when the Test API is on |
 
 Never commit `.env`.
 
@@ -267,3 +269,13 @@ Static files in `apps/web/public/`, served by the web origin at the site root: `
 ## Content-Security-Policy (`CSP_ENABLED`, `CSP_REPORT_ONLY`)
 
 Off by default. `CSP_ENABLED=true` adds a `Content-Security-Policy` header to API responses (helmet, CSP only) and to the web dev/preview server (Vite plugin); `CSP_REPORT_ONLY=true` switches both to `Content-Security-Policy-Report-Only`. Violations are POSTed to `POST /api/csp-report` (logged, `204`). Swagger `/docs` gets a relaxed policy. Details and limitations: `docs/features/csp.md`.
+
+## Test API (`/api/test`)
+
+For future automated tests. Registered **only** when `ENABLE_TEST_API=true` or `NODE_ENV=test`, and never when `NODE_ENV=production` (routes do not exist, so they answer 404 and are absent from Swagger). Every call needs the header `x-test-key: <TEST_API_KEY>` (missing or wrong gives 401); the API will not start with the Test API on and no `TEST_API_KEY`.
+
+- `POST /api/test/reset` empties comments, attachments, tickets and users (ids restart at 1), deletes uploaded files, then re-runs the deterministic seed. It refuses to run unless `DB_NAME` contains `test`: use a dedicated database.
+- `POST /api/test/seed` `{ "tickets": 5, "status": "open" }` adds deterministic `Test ticket N` tickets (optional `priority`, `createdBy`); needs the base users (otherwise 409: call reset first).
+- `POST /api/test/users` `{ "email", "password", "role" }` creates a user (409 if the email exists).
+
+Details and curl examples: `docs/features/test-api.md`.
