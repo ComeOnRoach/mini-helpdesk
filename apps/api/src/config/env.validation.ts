@@ -40,6 +40,8 @@ export function validateEnv(config: Record<string, unknown>): Record<string, unk
     (config.NODE_ENV === 'test' || config.ENABLE_TEST_API === 'true');
   if (testApiOn && String(config.TEST_API_KEY ?? '').trim() === '') {
     errors.push('TEST_API_KEY is required when the Test API is enabled');
+  }
+
   const slowMs = config.SLOW_API_MS;
   if (slowMs !== undefined && slowMs !== '') {
     if (!/^\d+$/.test(String(slowMs)) || Number(slowMs) > 60000) {
