@@ -78,6 +78,7 @@ mini-helpdesk/
 │  └─ features/               one document per finished feature
 ├─ docker-compose.yml         db + api + web
 ├─ docker-compose.override.yml  dev file watching (polling) for Windows bind mounts
+├─ docker-compose.prod.yml    production-like stack built from the Dockerfiles
 ├─ .env.example               all environment variables with defaults
 ├─ eslint.config.mjs          ESLint (flat config), Prettier settings in .prettierrc
 ├─ CLAUDE.md                  project rules
@@ -104,6 +105,7 @@ mini-helpdesk/
 | `WEB_ORIGIN`       | `http://localhost:5173` | Origin allowed by API CORS                                     |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
+| `WEB_PORT`         | `5173`                  | Host port of the web container in `docker-compose.prod.yml`    |
 
 Never commit `.env`.
 
@@ -257,3 +259,18 @@ More detail: `docs/features/data-testid.md`.
 ## Theme switcher (`nav-theme-toggle`)
 
 The header button switches light/dark (`data-theme` on `<html>`, saved in `localStorage` key `theme`, default from `prefers-color-scheme`, print stays black on white); the Help widgets follow it. Details: `docs/features/theme-switcher.md`.
+
+## Production images (`docker-compose.prod.yml`)
+
+`docker compose up` stays the hot-reload dev stack. To run the stack from the production images
+(`apps/api/Dockerfile`: Node 20 alpine, non-root, about 230 MB; `apps/web/Dockerfile`: Vite build
+served by unprivileged nginx on port 8080):
+
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
+`VITE_API_URL` is baked into the web bundle at build time and must be the address the browser uses
+for the API. The web container sets the CSP header from `CSP_ENABLED` / `CSP_REPORT_ONLY`.
+Build context is the repository root; each image has its own `<Dockerfile>.dockerignore`.
+See `docs/features/dockerfiles.md`.
