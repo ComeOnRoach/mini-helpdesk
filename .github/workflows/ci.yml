@@ -182,7 +182,7 @@ jobs:
 
       - name: Check image size and non-root user
         run: |
-          docker image ls helpdesk-api:ci helpdesk-web:ci
+          docker image ls --filter 'reference=helpdesk-*:ci'
           size=$(docker image inspect helpdesk-api:ci --format '{{.Size}}')
           echo "api image: $((size / 1024 / 1024)) MB"
           if [ "$size" -ge $((300 * 1024 * 1024)) ]; then
