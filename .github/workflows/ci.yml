@@ -47,6 +47,8 @@ jobs:
       PORT: 3000
       WEB_ORIGIN: http://127.0.0.1:4173
       VITE_API_URL: http://127.0.0.1:3000
+      # NODE_ENV=test enables the Test API (T7.3), which requires a key at startup.
+      TEST_API_KEY: ci-test-key
     steps:
       - uses: actions/checkout@v4
 
