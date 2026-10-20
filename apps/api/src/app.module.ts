@@ -10,6 +10,7 @@ import { TicketsModule } from './tickets/tickets.module';
 import { validateEnv } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { HealthModule } from './health/health.module';
     AttachmentsModule,
     RealtimeModule,
     AnalyticsModule,
+    StatsModule,
   ],
 })
 export class AppModule {}

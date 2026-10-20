@@ -257,3 +257,7 @@ More detail: `docs/features/data-testid.md`.
 ## Theme switcher (`nav-theme-toggle`)
 
 The header button switches light/dark (`data-theme` on `<html>`, saved in `localStorage` key `theme`, default from `prefers-color-scheme`, print stays black on white); the Help widgets follow it. Details: `docs/features/theme-switcher.md`.
+
+## Dashboard and stats
+
+`GET /api/stats` returns `{ total, open, in_progress, closed, byPriority: { low, medium, high } }` (agent: all tickets, user: only their own; JWT required). The `/dashboard` page (`nav-dashboard`) shows the counters as cards with CSS bars (`stat-open`, `stat-in-progress`, `stat-closed`, `stat-total`, `stat-priority-*`, each with `data-value`) plus loading/empty/error states and a Refresh button. Details: `docs/features/stats-dashboard.md`.
