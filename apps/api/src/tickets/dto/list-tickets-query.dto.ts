@@ -51,7 +51,11 @@ export class ListTicketsQueryDto {
   @IsOptional()
   priority?: TicketPriority;
 
-  @ApiPropertyOptional({ description: 'Exact tag, for example "bug"', maxLength: 30, example: 'bug' })
+  @ApiPropertyOptional({
+    description: 'Exact tag, for example "bug"',
+    maxLength: 30,
+    example: 'bug',
+  })
   @Transform(emptyToUndefined)
   @IsString()
   @MaxLength(30, { message: 'tag must be at most 30 characters' })
