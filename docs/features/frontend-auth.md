@@ -7,7 +7,9 @@
 - Register creates the account, then logs in and opens `/tickets`. Login opens `/tickets`.
 - A logged-in visitor opening `/login` or `/register` is sent to `/tickets`.
 - `/tickets` is wrapped in `ProtectedRoute`: no token goes to `/login`. With a stored token the app calls
-  `GET /api/auth/me` first; if the token is invalid or expired it is removed and the visitor is sent to `/login`.
+  `GET /api/auth/me` first; if the API answers 401 (invalid or expired token) it is removed and the visitor is sent to `/login`.
+  A network error or a request cut off by navigating away keeps the token, so a quick reload or a short API outage does not
+  log the user out (fixed after epic 7: the restore used to drop the token on any failure).
 - The navigation bar shows Login/Register to guests and the user's email with a Logout button to logged-in users.
 
 ## Token

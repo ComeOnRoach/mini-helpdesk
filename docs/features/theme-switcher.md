@@ -7,7 +7,7 @@ A header button switches the whole UI between a light and a dark theme. The choi
 - The theme is the `data-theme="light|dark"` attribute on `<html>`.
 - `apps/web/src/styles.css` defines colour tokens (`--bg`, `--surface`, `--text`, `--muted`, `--border`, ...) in `:root`. The dark values live in `:root[data-theme='dark']` at the end of the file. Existing rules use `var(--...)` instead of hardcoded colours. Fixed-colour elements (primary/danger buttons, toasts, badge) are unchanged because they use white text on both themes.
 - Initial value: a saved `theme` (`light` or `dark`) wins; otherwise `prefers-color-scheme`. Nothing is written to storage until the user presses the button. An invalid stored value is ignored.
-- No flash: an inline script in `apps/web/index.html` sets `data-theme` in `<head>`, before the first paint and before React mounts.
+- No flash: a synchronous external script (`apps/web/public/theme-init.js`, loaded from `<head>` of `apps/web/index.html`; not inline, because of CSP, see `csp.md`) sets `data-theme` before the first paint and before React mounts.
 - `ThemeToggle` (`apps/web/src/components/theme-toggle.tsx`) is rendered in the header for guests and logged-in users. No provider or context is used.
 - The static widgets of `/help` (`/widgets/faq.html`, `/widgets/feedback.html`, including the nested iframe) load `/widgets/theme-init.js` and use their own `--w-*` tokens in `widgets.css`. They listen to the `storage` event, so an open Help page updates live when the button is pressed.
 - Print: the print page stays black on white. In `@media print` the dark tokens are overridden with white/black, so printing from dark mode gives the same result as from light mode.

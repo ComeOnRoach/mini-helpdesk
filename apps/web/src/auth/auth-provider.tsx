@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { track } from '../lib/analytics';
 import { loginRequest, meRequest, registerRequest } from '../api/auth';
 import type { User } from '../api/auth';
-import { TOKEN_KEY } from '../api/client';
+import { ApiError, TOKEN_KEY } from '../api/client';
 import { AuthContext } from './auth-context';
 import type { AuthContextValue } from './auth-context';
 
@@ -19,7 +19,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let active = true;
     meRequest()
       .then((me) => active && setUser(me))
-      .catch(() => localStorage.removeItem(TOKEN_KEY))
+      .catch((error: unknown) => {
+        // Only an invalid or expired token is dropped. A network error, or a request cut off by
+        // navigating away, must keep the token (otherwise a quick reload logs the user out).
+        if (error instanceof ApiError && error.status === 401) localStorage.removeItem(TOKEN_KEY);
+      })
       .finally(() => active && setLoading(false));
     return () => {
       active = false;

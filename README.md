@@ -110,9 +110,17 @@ mini-helpdesk/
 | `TEST_API_KEY`     | empty                   | Playwright only: `x-test-key` value, must equal the API's key (Test API, T7.3) |
 | `UPLOAD_DIR`       | `<api cwd>/uploads`     | Folder for ticket attachments (compose: `/app/uploads` volume) |
 | `MAX_UPLOAD_BYTES` | `5242880`               | Attachment size limit in bytes (5 MB)                          |
+
 | `WEB_PORT`         | `5173`                  | Host port of the web container in `docker-compose.prod.yml`    |
 | `CSP_ENABLED`      | `false`                 | `true` sends the Content-Security-Policy header (T7.2; nginx in the prod web image) |
 | `CSP_REPORT_ONLY`  | `false`                 | `true` sends it as `Content-Security-Policy-Report-Only`       |
+| `CSP_ENABLED` | `false` | `true` sends a `Content-Security-Policy` header from the API (helmet) and from the web dev/preview server |
+| `CSP_REPORT_ONLY` | `false` | With `CSP_ENABLED=true`, `true` sends `Content-Security-Policy-Report-Only` instead (violations are reported, not blocked) |
+| `ENABLE_TEST_API` | `false` | `true` (or `NODE_ENV=test`) registers `/api/test/*`; ignored when `NODE_ENV=production` |
+| `TEST_API_KEY` | _(empty)_ | Secret for the `x-test-key` header; required when the Test API is on |
+| `SLOW_API_MS` | `0` | Delay in ms (0-60000) added to every API response except `/health`, analytics and test routes; `0` = off |
+| `FLAKY_RATE` | `0` | Chance (0-1) that `GET /api/tickets` fails with a random 500; `0` = off |
+
 
 Never commit `.env`.
 
@@ -282,3 +290,34 @@ for the API. The web container sets the CSP header from `CSP_ENABLED` / `CSP_REP
 Build context is the repository root; each image has its own `<Dockerfile>.dockerignore`.
 The CI job `docker` builds both images and checks that the api image is under 300 MB and that neither image runs as root.
 See `docs/features/dockerfiles.md`.
+## Service files: robots.txt and sitemap.xml
+
+Static files in `apps/web/public/`, served by the web origin at the site root: `/robots.txt` (`text/plain`; `Disallow: /admin`, `Disallow: /tickets`, `Sitemap: http://localhost:5173/sitemap.xml`) and `/sitemap.xml` (XML; `/`, `/login`, `/register`, `/help`, `/contacts`; no private pages). The host is hardcoded as `http://localhost:5173`; edit both files for another host. Playwright: `request.get`, `page.goto`, `context.route('**/robots.txt', ...)`. Details: `docs/features/robots-sitemap.md`.
+
+## Content-Security-Policy (`CSP_ENABLED`, `CSP_REPORT_ONLY`)
+
+Off by default. `CSP_ENABLED=true` adds a `Content-Security-Policy` header to API responses (helmet, CSP only) and to the web dev/preview server (Vite plugin); `CSP_REPORT_ONLY=true` switches both to `Content-Security-Policy-Report-Only`. Violations are POSTed to `POST /api/csp-report` (logged, `204`). Swagger `/docs` gets a relaxed policy. Details and limitations: `docs/features/csp.md`.
+
+## Test API (`/api/test`)
+
+For future automated tests. Registered **only** when `ENABLE_TEST_API=true` or `NODE_ENV=test`, and never when `NODE_ENV=production` (routes do not exist, so they answer 404 and are absent from Swagger). Every call needs the header `x-test-key: <TEST_API_KEY>` (missing or wrong gives 401); the API will not start with the Test API on and no `TEST_API_KEY`.
+
+- `POST /api/test/reset` empties comments, attachments, tickets and users (ids restart at 1), deletes uploaded files, then re-runs the deterministic seed. It refuses to run unless `DB_NAME` contains `test`: use a dedicated database.
+- `POST /api/test/seed` `{ "tickets": 5, "status": "open" }` adds deterministic `Test ticket N` tickets (optional `priority`, `createdBy`); needs the base users (otherwise 409: call reset first).
+- `POST /api/test/users` `{ "email", "password", "role" }` creates a user (409 if the email exists).
+
+Details and curl examples: `docs/features/test-api.md`.
+
+## Slow / flaky API mode
+
+Two env switches (both `0` = off, the default) let you practise waits, timeouts and retries:
+
+- `SLOW_API_MS=2000` delays every API response by 2 s (not `/health`, `/api/analytics/*`, `/api/test/*`).
+- `FLAKY_RATE=0.3` makes `GET /api/tickets` (the list only) fail with a 500 in the usual error format with probability 0.3. It is random on purpose; use `0` or `1` for exact behaviour.
+- `x-delay-ms: <ms>` header replaces `SLOW_API_MS` for one request (max 10000); honoured only when `NODE_ENV=test` or `ENABLE_TEST_API=true`.
+
+Invalid values stop the API at startup; in production a startup warning is logged. The tickets page shows loading, then an error with a Retry button (`tickets-retry`). Details: `docs/features/slow-api-flaky-mode.md`.
+
+## Dashboard and stats
+
+`GET /api/stats` returns `{ total, open, in_progress, closed, byPriority: { low, medium, high } }` (agent: all tickets, user: only their own; JWT required). The `/dashboard` page (`nav-dashboard`) shows the counters as cards with CSS bars (`stat-open`, `stat-in-progress`, `stat-closed`, `stat-total`, `stat-priority-*`, each with `data-value`) plus loading/empty/error states and a Refresh button. Details: `docs/features/stats-dashboard.md`.

@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { ProtectedRoute } from './auth/protected-route';
 import { Layout } from './components/layout';
 import { ContactsPage } from './pages/contacts-page';
+import { DashboardPage } from './pages/dashboard-page';
 import { HelpPage } from './pages/help-page';
 import { HomePage } from './pages/home-page';
 import { LoginPage } from './pages/login-page';
@@ -30,6 +31,7 @@ export function App() {
           <Route path="tickets/new" element={<TicketFormPage />} />
           <Route path="tickets/:id" element={<TicketDetailsPage />} />
           <Route path="tickets/:id/edit" element={<TicketFormPage />} />
+          <Route path="dashboard" element={<DashboardPage />} />
         </Route>
         <Route path="help" element={<HelpPage />} />
         <Route path="contacts" element={<ContactsPage />} />

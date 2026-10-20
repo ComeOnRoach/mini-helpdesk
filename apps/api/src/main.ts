@@ -4,10 +4,14 @@ import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { setupApp } from './common/app-setup';
 import { RealtimeIoAdapter } from './realtime/socket-io.adapter';
+import { applyCsp } from './common/csp';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
+
+  // CSP header (CSP_ENABLED / CSP_REPORT_ONLY); must be registered before the routes.
+  applyCsp(app, config);
 
   app.setGlobalPrefix('api', { exclude: ['health'] });
   setupApp(app);

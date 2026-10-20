@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /admin
+Disallow: /tickets
+Sitemap: http://localhost:5173/sitemap.xml
