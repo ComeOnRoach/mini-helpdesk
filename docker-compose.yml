@@ -42,6 +42,8 @@ services:
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-5242880}
       CSP_ENABLED: ${CSP_ENABLED:-false}
       CSP_REPORT_ONLY: ${CSP_REPORT_ONLY:-false}
+      SLOW_API_MS: ${SLOW_API_MS:-0}
+      FLAKY_RATE: ${FLAKY_RATE:-0}
     ports:
       - '${PORT:-3000}:${PORT:-3000}'
     volumes:

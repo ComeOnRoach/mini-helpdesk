@@ -108,6 +108,8 @@ mini-helpdesk/
 | `CSP_REPORT_ONLY` | `false` | With `CSP_ENABLED=true`, `true` sends `Content-Security-Policy-Report-Only` instead (violations are reported, not blocked) |
 | `ENABLE_TEST_API` | `false` | `true` (or `NODE_ENV=test`) registers `/api/test/*`; ignored when `NODE_ENV=production` |
 | `TEST_API_KEY` | _(empty)_ | Secret for the `x-test-key` header; required when the Test API is on |
+| `SLOW_API_MS` | `0` | Delay in ms (0-60000) added to every API response except `/health`, analytics and test routes; `0` = off |
+| `FLAKY_RATE` | `0` | Chance (0-1) that `GET /api/tickets` fails with a random 500; `0` = off |
 
 Never commit `.env`.
 
@@ -279,3 +281,13 @@ For future automated tests. Registered **only** when `ENABLE_TEST_API=true` or `
 - `POST /api/test/users` `{ "email", "password", "role" }` creates a user (409 if the email exists).
 
 Details and curl examples: `docs/features/test-api.md`.
+
+## Slow / flaky API mode
+
+Two env switches (both `0` = off, the default) let you practise waits, timeouts and retries:
+
+- `SLOW_API_MS=2000` delays every API response by 2 s (not `/health`, `/api/analytics/*`, `/api/test/*`).
+- `FLAKY_RATE=0.3` makes `GET /api/tickets` (the list only) fail with a 500 in the usual error format with probability 0.3. It is random on purpose; use `0` or `1` for exact behaviour.
+- `x-delay-ms: <ms>` header replaces `SLOW_API_MS` for one request (max 10000); honoured only when `NODE_ENV=test` or `ENABLE_TEST_API=true`.
+
+Invalid values stop the API at startup; in production a startup warning is logged. The tickets page shows loading, then an error with a Retry button (`tickets-retry`). Details: `docs/features/slow-api-flaky-mode.md`.
